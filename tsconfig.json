@@ -15,7 +15,7 @@
     "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
 
-    // tsc コマンドは自分のソースコードの型チェックだけに用いる（ライブラリー間の整合性まではチェックしない）。
+    // tsc コマンドは自分のソースコードの型チェックだけに用いる（パッケージ間の整合性まではチェックしない）。
     // TypeScript から JavaScript の実行ファイルへの変換はほかの仕組みを使う。
     "skipLibCheck": true,
     "noEmit": true,

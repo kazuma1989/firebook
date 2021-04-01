@@ -1,4 +1,5 @@
 // @ts-check
+/// <reference lib="es2018" />
 
 // Snowpack Configuration File
 // See all supported options: https://www.snowpack.dev/reference/configuration
@@ -7,7 +8,7 @@
 const config = {
   // Create React App のフォルダー構成に近づける。
   mount: {
-    "./public/": { url: "/", static: true, resolve: false },
+    "./public/": { url: "/" },
     "./src/": { url: "/dist/" },
   },
 
@@ -20,9 +21,8 @@ const config = {
   ],
 
   devOptions: {
-    // Firebase エミュレータのポートと衝突しないようにする。
-    // （エミュレータのポートは firebase.json で指定）
-    port: 8000,
+    // Create React App のデフォルトのポートと同じにする。
+    port: 3000,
 
     // 自動でブラウザーを開きたくないときは open=none を指定する。
     // もしくは CLI オプションで `--open none` を渡す。
