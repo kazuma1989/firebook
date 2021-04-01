@@ -1,12 +1,13 @@
-// @ts-check
 /// <reference lib="es2018" />
 
 // Snowpack Configuration File
 // See all supported options: https://www.snowpack.dev/reference/configuration
 
+const { BROWSER, HOST, PORT, BUILD_PATH } = process.env
+
 /** @type {import("snowpack").SnowpackUserConfig} */
 const config = {
-  // Create React App のフォルダー構成に近づける。
+  // Create React App のディレクトリ構成に近づける。
   mount: {
     "./public/": { url: "/" },
     "./src/": { url: "/dist/" },
@@ -16,18 +17,21 @@ const config = {
     // .env.development, .env.production から環境変数を読み込む。
     "@snowpack/plugin-dotenv",
 
-    // TypeScript の型チェックを実行する。
+    // TypeScript の型検査結果をターミナルに表示する。
     "@snowpack/plugin-typescript",
   ],
 
   devOptions: {
+    // localhost 以外で起動したい場合は指定する。
+    hostname: HOST || "localhost",
+
     // Create React App のデフォルトのポートと同じにする。
-    port: 3000,
+    port: parseInt(PORT) || 3000,
 
     // 自動でブラウザーを開きたくないときは open=none を指定する。
     // もしくは CLI オプションで `--open none` を渡す。
     // e.g.) $ npm start -- --open none
-    // open: "none",
+    open: BROWSER,
   },
 
   routes: [
@@ -38,7 +42,7 @@ const config = {
 
   buildOptions: {
     // Create React App のデフォルトの出力先と同じにする。
-    out: "./build/",
+    out: BUILD_PATH || "./build/",
 
     // デバッグのためソースマップを有効にしておく。
     sourcemap: true,

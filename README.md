@@ -1,9 +1,7 @@
 # Firebook
 
-> ✨ Bootstrapped with Create Snowpack App (CSA).
-
 ```console
-npx create-snowpack-app my-app --template @kazuma1989/firebook
+npx degit kazuma1989/firebook
 ```
 
 ## これは何
@@ -27,6 +25,7 @@ IDE は Visual Studio Code が推奨です。必要な拡張機能をすぐイ�
 
 アプリを開発モードで起動します。ブラウザーが起動して http://localhost:8000 が表示されます。
 ブラウザーを起動したくないときは `-- --open none` オプションを渡してください。
+もしくは環境変数 `BROWSER` を `none` に設定してください。(e.g. `BROWSER=none npm start`)
 
 ソースコードを編集するとページがリロードします。
 TypeScript による型検査のエラーはコンソールに表示されます。
@@ -47,13 +46,3 @@ TypeScript による型検査のエラーはコンソールに表示されます
 ### `npm run lint`
 
 ソースコードを静的検査します。
-
-## UI を実装済みのソースコードまで進めるには
-
-UI の実装をスキップして学習を進めたいときは、次のコマンドを実行してください。
-**ローカルの編集内容を上書きするので注意してください。**
-
-```console
-npx @kazuma1989/firebook update
-npm install
-```
