@@ -1,0 +1,6 @@
+/.firebase
+/.snowpack
+/build
+
+node_modules
+*.log

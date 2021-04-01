@@ -1,0 +1,82 @@
+[
+  {
+    "uid": "uid_1",
+    "displayName": "火炎 本太郎",
+    "photoURL": "https://source.unsplash.com/pOhAuDUci0s/332x332",
+    "posts": [
+      {
+        "id": "post_3",
+        "author": "uid_1",
+        "text": "新しいMacBookです！",
+        "imgSrc": "https://source.unsplash.com/RSCirJ70NDM/400x300",
+        "postedAt": 1600900800701,
+        "likes": ["uid_2"],
+        "totalComments": 1,
+        "comments": [
+          {
+            "id": "comment_1",
+            "author": "uid_2",
+            "text": "かっこいい！",
+            "postedAt": 1600900800706
+          }
+        ]
+      },
+
+      {
+        "id": "post_1",
+        "author": "uid_1",
+        "text": "仕事でやらかした〜😢",
+        "postedAt": 1600900800699,
+        "likes": [],
+        "totalComments": 0,
+        "comments": []
+      }
+    ]
+  },
+
+  {
+    "uid": "uid_2",
+    "displayName": "花布 栞",
+    "photoURL": "https://source.unsplash.com/LaK153ghdig/332x332",
+    "posts": [
+      {
+        "id": "post_2",
+        "author": "uid_2",
+        "text": "おしゃれなレストランに行きました！",
+        "imgSrc": "https://source.unsplash.com/Ciqxn7FE4vE/1920x1280",
+        "postedAt": 1600900800700,
+        "likes": ["uid_1"],
+        "totalComments": 4,
+        "comments": [
+          {
+            "id": "comment_2",
+            "author": "uid_1",
+            "text": "いいですね。なんていうお店ですか？",
+            "postedAt": 1600900800702
+          },
+
+          {
+            "id": "comment_3",
+            "author": "uid_2",
+            "text": "FIREBRICKというお店です！みなとみらいにありますよ。",
+            "postedAt": 1600900800703
+          },
+
+          {
+            "id": "comment_4",
+            "author": "uid_1",
+            "text": "今度行ってみようかな〜",
+            "postedAt": 1600900800704
+          },
+
+          {
+            "id": "comment_5",
+            "author": "uid_2",
+            "text": "ぜひぜひ😊",
+            "postedAt": 1600900800705
+          }
+        ]
+      }
+    ]
+  }
+]
