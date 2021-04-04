@@ -19,6 +19,9 @@ const config = {
 
     // TypeScript の型検査結果をターミナルに表示する。
     "@snowpack/plugin-typescript",
+
+    // カスタムプラグインを適用する。
+    "./snowpack-plugin",
   ],
 
   devOptions: {
