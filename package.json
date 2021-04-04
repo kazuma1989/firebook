@@ -13,11 +13,11 @@
   },
   "dependencies": {
     "@emotion/css": "11.1.x",
+    "body-scroll-lock": "3.1.x",
+    "focus-trap": "6.3.x",
     "react": "17.0.x",
     "react-dom": "17.0.x",
     "react-router-dom": "5.2.x",
-    "body-scroll-lock": "3.1.x",
-    "focus-trap": "6.3.x",
     "tabbable": "5.1.x"
   },
   "devDependencies": {
