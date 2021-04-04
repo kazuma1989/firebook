@@ -29,7 +29,7 @@ const config = {
     hostname: HOST || "localhost",
 
     // Create React App のデフォルトのポートと同じにする。
-    port: parseInt(PORT) || 3000,
+    port: (PORT && parseInt(PORT)) || 3000,
 
     // 自動でブラウザーを開きたくないときは open=none を指定する。
     // もしくは CLI オプションで `--open none` を渡す。
