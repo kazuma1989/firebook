@@ -1,7 +1,7 @@
 # Firebook
 
 ```console
-npx degit kazuma1989/firebook
+npx hina kazuma1989/firebook
 ```
 
 ## これは何
@@ -23,7 +23,7 @@ IDE は Visual Studio Code が推奨です。必要な拡張機能をすぐイ�
 
 ### `npm start [-- --open none]`
 
-アプリを開発モードで起動します。ブラウザーが起動して http://localhost:8000 が表示されます。
+アプリを開発モードで起動します。ブラウザーが起動して http://localhost:3000 が表示されます。
 ブラウザーを起動したくないときは `-- --open none` オプションを渡してください。
 もしくは環境変数 `BROWSER` を `none` に設定してください。(e.g. `BROWSER=none npm start`)
 
@@ -37,7 +37,7 @@ TypeScript による型検査のエラーはコンソールに表示されます
 
 ### `npm test`
 
-初期状態ではテストがないので、エラー終了します。
+初期状態ではテストがないので、何も起きません。
 
 ### `npm run format`
 
