@@ -4,6 +4,7 @@ import { GlobalLayout } from "./components/GlobalLayout"
 import { UserProvider } from "./hooks/useUser"
 import { useUserState } from "./hooks/useUserState"
 import { PageHome } from "./pages/PageHome"
+import { PageLoading } from "./pages/PageLoading"
 import { PageNotFound } from "./pages/PageNotFound"
 import { PageProfile } from "./pages/PageProfile"
 import { PageSignIn } from "./pages/PageSignIn"
@@ -17,7 +18,11 @@ import { PageSignUp } from "./pages/PageSignUp"
  */
 export function App() {
   // TODO モック実装を本物にする。
-  const user = useUserState()
+  const { user, loading } = useUserState()
+
+  if (loading) {
+    return <PageLoading />
+  }
 
   // user がないとき＝未サインイン状態。
   if (!user) {

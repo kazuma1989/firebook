@@ -4,13 +4,21 @@ import { ENV_API_ENDPOINT } from "../env"
 import { useMockAuth } from "./useMockAuth"
 import { User } from "./useUser"
 
+interface UserState {
+  user: User | null
+  loading: boolean
+}
+
 /**
  * サインインしているユーザーのプロフィール情報をデータベースから取得する。
  */
 export function useUserState() {
   const { currentUser } = useMockAuth()
 
-  const [userState, setUserState] = useState<User | null>(null)
+  const [userState, setUserState] = useState<UserState>({
+    user: null,
+    loading: true,
+  })
 
   const uid = currentUser?.uid
   useEffect(() => {
@@ -21,8 +29,11 @@ export function useUserState() {
       .then((r) => r.json())
       .then((user: UserEntity) => {
         setUserState({
-          ...user,
-          uid: user.id,
+          user: {
+            ...user,
+            uid: user.id,
+          },
+          loading: false,
         })
       })
   }, [uid])
@@ -30,7 +41,10 @@ export function useUserState() {
   useEffect(() => {
     // サインアウトしたらプロフィール情報もクリアしておく。
     if (!currentUser) {
-      setUserState(null)
+      setUserState({
+        user: null,
+        loading: false,
+      })
     }
   }, [currentUser])
 
