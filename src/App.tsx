@@ -1,7 +1,8 @@
 import { Route, Switch } from "react-router-dom"
 import { GlobalHeader } from "./components/GlobalHeader"
 import { GlobalLayout } from "./components/GlobalLayout"
-import { useMockAuth } from "./hooks/useMockAuth"
+import { UserProvider } from "./hooks/useUser"
+import { useUserState } from "./hooks/useUserState"
 import { PageHome } from "./pages/PageHome"
 import { PageNotFound } from "./pages/PageNotFound"
 import { PageProfile } from "./pages/PageProfile"
@@ -16,9 +17,10 @@ import { PageSignUp } from "./pages/PageSignUp"
  */
 export function App() {
   // TODO モック実装を本物にする。
-  const auth = useMockAuth()
+  const user = useUserState()
 
-  if (!auth.authenticated) {
+  // user がないとき＝未サインイン状態。
+  if (!user) {
     return (
       <Switch>
         <Route exact path="/sign-up">
@@ -32,27 +34,31 @@ export function App() {
     )
   }
 
+  // user があるとき＝サインイン済み状態。
+  // コンテクストから user にアクセスできるようにする。
   return (
-    <GlobalLayout>
-      <GlobalLayout.Header>
-        <GlobalHeader />
-      </GlobalLayout.Header>
+    <UserProvider value={user}>
+      <GlobalLayout>
+        <GlobalLayout.Header>
+          <GlobalHeader />
+        </GlobalLayout.Header>
 
-      <GlobalLayout.Body>
-        <Switch>
-          <Route exact path="/">
-            <PageHome />
-          </Route>
+        <GlobalLayout.Body>
+          <Switch>
+            <Route exact path="/">
+              <PageHome />
+            </Route>
 
-          <Route exact path="/profile">
-            <PageProfile />
-          </Route>
+            <Route exact path="/profile">
+              <PageProfile />
+            </Route>
 
-          <Route>
-            <PageNotFound />
-          </Route>
-        </Switch>
-      </GlobalLayout.Body>
-    </GlobalLayout>
+            <Route>
+              <PageNotFound />
+            </Route>
+          </Switch>
+        </GlobalLayout.Body>
+      </GlobalLayout>
+    </UserProvider>
   )
 }

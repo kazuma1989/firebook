@@ -15,14 +15,14 @@ declare global {
 
       // .env.development, .env.production に値をセットする必要あり。
       // @snowpack/plugin-dotenv が拾って値を設定してくれる。
-      SNOWPACK_PUBLIC_TEST_VALUE: string
+      SNOWPACK_PUBLIC_API_ENDPOINT: string
     }
   }
 }
 
 const {
   MODE: ENV_MODE,
-  SNOWPACK_PUBLIC_TEST_VALUE: ENV_TEST_VALUE,
+  SNOWPACK_PUBLIC_API_ENDPOINT: ENV_API_ENDPOINT,
 } = import.meta.env
 
-export { ENV_MODE, ENV_TEST_VALUE }
+export { ENV_MODE, ENV_API_ENDPOINT }

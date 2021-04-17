@@ -1,9 +1,113 @@
 import { useEffect, useState } from "react"
-import stubAuth from "../stub/auth.json"
+import { InsecureAuthInfo, User } from "../entity-types"
+import { ENV_API_ENDPOINT } from "../env"
 
-const STORAGE_KEY = "firebook.authenticated"
+/**
+ * サインイン機能をモックする。
+ * Session storage にサインイン状態を記録するので、ブラウザーを開いている間は持続する。
+ *
+ * カスタムイベントによって session storage の変更を検知している。
+ */
+export function useMockAuth() {
+  const [currentUser, setCurrentUser] = useState(getCurrentUserFromStorage())
 
-const EVENT_TYPE = "firebook.useMockAuth"
+  useEffect(() => {
+    const unsubscribe = storage.subscribe(() => {
+      setCurrentUser(getCurrentUserFromStorage())
+    })
+
+    return unsubscribe
+  }, [])
+
+  return {
+    /**
+     * サインイン中のユーザーの情報。
+     */
+    currentUser,
+
+    /**
+     * サインイン（ログイン）する。
+     *
+     * モック API のレスポンスがあればサインイン成功とするだけの簡易な仕組み。
+     * 実際に認証するわけではない。
+     */
+    async signIn(email: string, password: string) {
+      const search = new URLSearchParams({
+        email,
+        insecurePlainPassword: password,
+      })
+
+      const [authInfo]: InsecureAuthInfo[] = await fetch(
+        `${ENV_API_ENDPOINT}/insecureAuthInfo?${search.toString()}`
+      ).then((r) => r.json())
+
+      if (!authInfo) {
+        throw new Error("サインインに失敗しました。")
+      }
+
+      setCurrentUserToStorage(authInfo)
+    },
+
+    /**
+     * サインアウト（ログアウト）する。
+     */
+    async signOut() {
+      storage.remove()
+    },
+
+    /**
+     * サインアップ（ユーザー登録）する。
+     *
+     * モックデータベースに users レコードを作成し、その ID に対応した認証レコードを作成する簡易な仕組み。
+     * 実際に認証するわけではない。
+     */
+    async signUp(email: string, password: string, displayName: string) {
+      const { id: uid }: User = await fetch(`${ENV_API_ENDPOINT}/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          displayName,
+        }),
+      }).then((r) => r.json())
+
+      const resp = await fetch(`${ENV_API_ENDPOINT}/insecureAuthInfo`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          insecurePlainPassword: password,
+          uid,
+        }),
+      })
+
+      if (!resp.ok) {
+        throw new Error("サインアップに失敗しました。")
+      }
+
+      const authInfo: InsecureAuthInfo = await resp.json()
+      setCurrentUserToStorage(authInfo)
+    },
+  }
+}
+
+/**
+ * サインイン中のユーザーの情報。
+ */
+interface CurrentUser {
+  uid: string
+}
+
+function getCurrentUserFromStorage(): CurrentUser | null {
+  return JSON.parse(storage.get() ?? "null")
+}
+
+function setCurrentUserToStorage(user: CurrentUser): void {
+  storage.set(JSON.stringify(user))
+}
 
 /**
  * サインイン状態をモックするための、session storage のラッパー。
@@ -35,68 +139,6 @@ const storage = {
   },
 }
 
-/**
- * サインイン機能をモックする。
- * Session storage にサインイン状態を記録するので、ブラウザーを開いている間は持続する。
- *
- * カスタムイベントによって session storage の変更を検知している。
- */
-export function useMockAuth() {
-  const [authenticated, setAuthenticated] = useState(Boolean(storage.get()))
+const STORAGE_KEY = "firebook.authenticated"
 
-  useEffect(() => {
-    const unsubscribe = storage.subscribe(() => {
-      setAuthenticated(Boolean(storage.get()))
-    })
-
-    return unsubscribe
-  }, [])
-
-  return {
-    authenticated,
-
-    async signUp(email: string, password: string, displayName: string) {
-      console.log({ email, password, displayName })
-
-      await wait(1_000)
-
-      if (
-        email === stubAuth.email &&
-        password === stubAuth.insecurePlainPassword
-      ) {
-        storage.set("yes")
-      } else {
-        throw new Error("サインアップに失敗しました。")
-      }
-    },
-
-    async signIn(email: string, password: string) {
-      console.log({ email, password })
-
-      await wait(1_000)
-
-      if (
-        email === stubAuth.email &&
-        password === stubAuth.insecurePlainPassword
-      ) {
-        storage.set("yes")
-      } else {
-        throw new Error("サインインに失敗しました。")
-      }
-    },
-
-    async signOut() {
-      storage.remove()
-    },
-  }
-}
-
-/**
- * 指定のミリ秒後に解決する Promise を返す。
- * 非同期処理にわざと遅延を挟むときに使う。
- */
-function wait(millisecond: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, millisecond)
-  })
-}
+const EVENT_TYPE = "firebook.useMockAuth"

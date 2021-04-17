@@ -16,13 +16,11 @@
   "users": [
     {
       "id": "uid_1",
-      "uid": "uid_1",
       "displayName": "火炎 本太郎",
       "photoURL": "https://source.unsplash.com/pOhAuDUci0s/332x332"
     },
     {
       "id": "uid_2",
-      "uid": "uid_2",
       "displayName": "花布 栞",
       "photoURL": "https://source.unsplash.com/LaK153ghdig/332x332"
     }
