@@ -2,7 +2,8 @@
   "name": "firebook",
   "license": "GPL-3.0-or-later",
   "engines": {
-    "node": ">=10.24.0"
+    "node": ">=10.19.0",
+    "npm": ">=6.13.4"
   },
   "scripts": {
     "start": "snowpack dev",
