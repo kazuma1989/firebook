@@ -10,23 +10,23 @@ const EVENT_TYPE = "firebook.useMockAuth"
  * カスタムイベントを発行して変更を検知できるようになっている。
  */
 const storage = {
-  get() {
+  get(): string | null {
     return sessionStorage.getItem(STORAGE_KEY)
   },
 
-  set(value: string) {
+  set(value: string): void {
     sessionStorage.setItem(STORAGE_KEY, value)
 
     window.dispatchEvent(new Event(EVENT_TYPE))
   },
 
-  remove() {
+  remove(): void {
     sessionStorage.removeItem(STORAGE_KEY)
 
     window.dispatchEvent(new Event(EVENT_TYPE))
   },
 
-  subscribe(listener: () => void) {
+  subscribe(listener: () => void): () => void {
     window.addEventListener(EVENT_TYPE, listener)
 
     return () => {
@@ -91,6 +91,12 @@ export function useMockAuth() {
   }
 }
 
-function wait(millisecond: number) {
-  return new Promise((resolve) => setTimeout(resolve, millisecond))
+/**
+ * 指定のミリ秒後に解決する Promise を返す。
+ * 非同期処理にわざと遅延を挟むときに使う。
+ */
+function wait(millisecond: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, millisecond)
+  })
 }

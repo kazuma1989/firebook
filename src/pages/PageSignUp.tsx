@@ -10,7 +10,7 @@ import { useMockAuth } from "../hooks/useMockAuth"
 /**
  * あらかじめ入力可能な値。
  */
-export type StatePageSignUp = {
+export interface StatePageSignUp {
   email?: string
   password?: string
 }

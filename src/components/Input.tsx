@@ -1,20 +1,19 @@
 import { css, cx } from "@emotion/css"
 import { useEffect, useRef, useState } from "react"
 
+type InputElementProps = JSX.IntrinsicElements["input"]
+
+interface Props extends InputElementProps {
+  customValidity?: string
+}
+
 /**
  * input 要素のラッパー。
  *
  * 既定のスタイルを持つほか、customValidity でバリデーションをカスタマイズできるようになっている。
  * customValidity に truthy な値を指定している間は、要素は :invalid な状態になる。
  */
-export function Input({
-  customValidity,
-  onBlur,
-  className,
-  ...props
-}: JSX.IntrinsicElements["input"] & {
-  customValidity?: string
-}) {
+export function Input({ customValidity, onBlur, className, ...props }: Props) {
   // 一度手をつけたかどうかのフラグを持つ。
   // 未入力の input が最初から :invalid スタイルになってしまうのを防ぐため。
   const [dirty, setDirty] = useState(false)

@@ -1,8 +1,10 @@
 /**
  * 進捗度 (0-100) の変化をモックする。
  */
-export function mockProgress(onNext?: (progress: number) => void) {
-  return new Promise<void>((resolve) => {
+export function mockProgress(
+  onNext?: (progress: number) => void
+): Promise<void> {
+  return new Promise((resolve) => {
     let progress = 0
     onNext?.(progress)
 

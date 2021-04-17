@@ -2,6 +2,10 @@ import { css, cx } from "@emotion/css"
 
 type ButtonElementProps = JSX.IntrinsicElements["button"]
 
+interface Props extends ButtonElementProps {
+  render?(props: ButtonElementProps): JSX.Element
+}
+
 /**
  * button 要素のラッパー。
  *
@@ -15,9 +19,7 @@ export function Button({
   render,
   className,
   ...props
-}: ButtonElementProps & {
-  render?: (props: ButtonElementProps) => JSX.Element
-}) {
+}: Props) {
   const buttonStyle = cx(
     css`
       color: var(--color-light-10);
