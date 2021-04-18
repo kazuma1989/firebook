@@ -1,7 +1,6 @@
 import { css } from "@emotion/css"
-import { useEffect, useState } from "react"
-import { Comment as CommentEntity } from "../entity-types"
-import { ENV_API_ENDPOINT } from "../env"
+import { useState } from "react"
+import { useComments } from "../hooks/useComments"
 import { Comment } from "./Comment"
 import { Dialog } from "./Dialog"
 import { ModalBackdrop } from "./ModalBackdrop"
@@ -21,17 +20,7 @@ export function CommentArea({
   style?: React.CSSProperties
 }) {
   const [limit, setLimit] = useState(3)
-
-  const [_comments, setComments] = useState<CommentEntity[]>([])
-  useEffect(() => {
-    fetch(`${ENV_API_ENDPOINT}/comments?postId=${postId}`)
-      .then((r) => r.json())
-      .then((comments: CommentEntity[]) => {
-        setComments(comments)
-      })
-  }, [postId])
-
-  const comments = _comments.slice(-limit) ?? []
+  const comments = useComments(postId, limit)
 
   const [deletingCommentId, setDeletingCommentId] = useState("")
   const finishConfirmingDeleteComment = () => {

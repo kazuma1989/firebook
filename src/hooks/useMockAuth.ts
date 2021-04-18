@@ -44,7 +44,7 @@ class AuthStateStorage {
    * インスタンスを初期化する。
    */
   init(): void {
-    this.currentUser = this.load()
+    this.load()
   }
 
   /**
@@ -86,9 +86,7 @@ class AuthStateStorage {
       throw new Error("サインインに失敗しました。")
     }
 
-    this.save({
-      uid: authInfo.uid,
-    })
+    this.save(authInfo.uid)
   }
 
   /**
@@ -136,9 +134,7 @@ class AuthStateStorage {
     }
 
     const authInfo: InsecureAuthInfo = await resp.json()
-    this.save({
-      uid: authInfo.uid,
-    })
+    this.save(authInfo.uid)
   }
 
   // #region private
@@ -147,39 +143,31 @@ class AuthStateStorage {
 
   private readonly listeners: AuthStateListener[] = []
 
-  private notify(): void {
+  private set(currentUser: CurrentUser | null): void {
+    this.currentUser = currentUser
+
     this.listeners.forEach((listener) => {
       listener(this.currentUser)
     })
   }
 
-  private load(): CurrentUser | null {
-    try {
-      return JSON.parse(
-        sessionStorage.getItem(AuthStateStorage.STORAGE_KEY) ?? "null"
-      )
-    } catch (error: unknown) {
-      return this.currentUser
-    }
+  private load(): void {
+    const uid = sessionStorage.getItem(AuthStateStorage.STORAGE_KEY)
+    if (!uid) return
+
+    this.set({ uid })
   }
 
-  private save(currentUser: CurrentUser): void {
-    this.currentUser = currentUser
+  private save(uid: string): void {
+    this.set({ uid })
 
-    sessionStorage.setItem(
-      AuthStateStorage.STORAGE_KEY,
-      JSON.stringify(this.currentUser)
-    )
-
-    this.notify()
+    sessionStorage.setItem(AuthStateStorage.STORAGE_KEY, uid)
   }
 
   private clear(): void {
-    this.currentUser = null
+    this.set(null)
 
     sessionStorage.removeItem(AuthStateStorage.STORAGE_KEY)
-
-    this.notify()
   }
 
   // #endregion private

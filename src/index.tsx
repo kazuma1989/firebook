@@ -4,14 +4,17 @@ import { BrowserRouter } from "react-router-dom"
 import { App } from "./App"
 import "./color.css"
 import { ErrorBoundary } from "./components/ErrorBoundary"
+import { GlobalSWRConfig } from "./components/GlobalSWRConfig"
 import "./global.css"
 
 ReactDOM.render(
   <React.StrictMode>
     <ErrorBoundary>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <GlobalSWRConfig>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </GlobalSWRConfig>
     </ErrorBoundary>
   </React.StrictMode>,
 

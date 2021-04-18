@@ -1,8 +1,7 @@
 import { css } from "@emotion/css"
-import { useEffect, useState } from "react"
-import { Post as PostEntity } from "../entity-types"
-import { ENV_API_ENDPOINT } from "../env"
+import { useState } from "react"
 import { usePostDraft } from "../hooks/usePostDraft"
+import { usePosts } from "../hooks/usePosts"
 import { mockProgress } from "../util/mockProgress"
 import { Dialog } from "./Dialog"
 import { DialogPostEdit } from "./DialogPostEdit"
@@ -21,14 +20,7 @@ export function PostArea({
   className?: string
   style?: React.CSSProperties
 }) {
-  const [posts, setPosts] = useState<PostEntity[]>([])
-  useEffect(() => {
-    fetch(`${ENV_API_ENDPOINT}/posts${targetUID ? `?author=${targetUID}` : ""}`)
-      .then((r) => r.json())
-      .then((posts: PostEntity[]) => {
-        setPosts(posts.sort((p1, p2) => p2.postedAt - p1.postedAt))
-      })
-  }, [targetUID])
+  const posts = usePosts(targetUID, 15)
 
   const [deletingState, setDeletingState] = useState<{
     postId: string

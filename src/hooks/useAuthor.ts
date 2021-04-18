@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react"
+import useSWR from "swr"
 import { User } from "../entity-types"
-import { ENV_API_ENDPOINT } from "../env"
 
 interface Author {
   displayName: string
@@ -10,20 +9,8 @@ interface Author {
 /**
  * 投稿者の情報を非同期で取得する。
  */
-export function useAuthor(authorId: string | undefined): Author | null {
-  const [author, setAuthor] = useState<Author | null>(null)
+export function useAuthor(authorId: string | undefined): Author | undefined {
+  const { data: user } = useSWR<User>(authorId ? `/users/${authorId}` : null)
 
-  useEffect(() => {
-    ;(async () => {
-      if (!authorId) return
-
-      const resp = await fetch(`${ENV_API_ENDPOINT}/users/${authorId}`)
-      if (!resp.ok) return
-
-      const user: User = await resp.json()
-      setAuthor(user)
-    })()
-  }, [authorId])
-
-  return author
+  return user
 }
