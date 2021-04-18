@@ -70,7 +70,6 @@ export function PageSignIn() {
             setErrorMessage("")
 
             try {
-              // TODO モック実装を本物にする。
               await auth.signIn(email, password)
 
               setSigningIn(false)

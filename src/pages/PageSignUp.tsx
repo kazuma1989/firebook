@@ -86,7 +86,6 @@ export function PageSignUp() {
             setErrorMessage("")
 
             try {
-              // TODO モック実装を本物にする。
               await auth.signUp(email, password, displayName)
 
               setSigningUp(false)

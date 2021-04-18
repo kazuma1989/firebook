@@ -139,7 +139,6 @@ export function GlobalHeader({
               onClick={() => {
                 closeMenu()
 
-                // TODO モック実装を本物にする。
                 auth.signOut()
               }}
             >
