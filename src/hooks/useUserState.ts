@@ -13,18 +13,18 @@ interface UserState {
  * サインインしているユーザーのプロフィール情報をデータベースから取得する。
  */
 export function useUserState() {
-  const { currentUser } = useMockAuth()
+  const { uid, loading: uidLoading } = useUID()
 
   const [userState, setUserState] = useState<UserState>({
     user: null,
     loading: true,
   })
 
-  const uid = currentUser?.uid
   useEffect(() => {
     if (!uid) return
 
     // サインインできたらデータベースからプロフィールを取得する。
+    // エンティティが存在しない可能性もあるが、その場合も loading = false にして取得完了とみなす。
     fetch(`${ENV_API_ENDPOINT}/users/${uid}`)
       .then((r) => r.json())
       .then((user: UserEntity) => {
@@ -39,14 +39,54 @@ export function useUserState() {
   }, [uid])
 
   useEffect(() => {
+    if (uidLoading) return
+
     // サインアウトしたらプロフィール情報もクリアしておく。
-    if (!currentUser) {
+    if (!uid) {
       setUserState({
         user: null,
         loading: false,
       })
     }
-  }, [currentUser])
+  }, [uid, uidLoading])
 
   return userState
+}
+
+/**
+ * サインイン状態を取得する。
+ */
+function useUID(): UIDState {
+  const auth = useMockAuth()
+
+  const [uidState, setUIDState] = useState<UIDState>(
+    // currentUser が初期化済みであれば、その値を初期値として使い、loading = false とする。
+    // currentUser が null のときは、サインアウト状態か初期化待ちかわからないので、loading = true とし、onAuthStateChanged を待つ。
+    auth.currentUser
+      ? {
+          uid: auth.currentUser.uid,
+          loading: false,
+        }
+      : {
+          loading: true,
+        }
+  )
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUIDState({
+        uid: currentUser?.uid,
+        loading: false,
+      })
+    })
+
+    return unsubscribe
+  }, [auth])
+
+  return uidState
+}
+
+interface UIDState {
+  uid?: string
+  loading: boolean
 }
