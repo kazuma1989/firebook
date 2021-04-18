@@ -1,5 +1,5 @@
 import useSWR from "swr"
-import { Post as PostEntity } from "../entity-types"
+import { PostEntity } from "../entity-types"
 
 interface Post {
   id: string

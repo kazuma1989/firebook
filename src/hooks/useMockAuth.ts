@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { InsecureAuthInfo, User } from "../entity-types"
+import { InsecureAuthInfoEntity, UserEntity } from "../entity-types"
 import { ENV_API_ENDPOINT } from "../env"
 
 /**
@@ -78,7 +78,7 @@ class AuthStateStorage {
       insecurePlainPassword: password,
     })
 
-    const [authInfo]: InsecureAuthInfo[] = await fetch(
+    const [authInfo]: InsecureAuthInfoEntity[] = await fetch(
       `${ENV_API_ENDPOINT}/insecureAuthInfo?${search.toString()}`
     ).then((r) => r.json())
 
@@ -107,7 +107,7 @@ class AuthStateStorage {
     password: string,
     displayName: string
   ): Promise<void> {
-    const { id: uid }: User = await fetch(`${ENV_API_ENDPOINT}/users`, {
+    const { id: uid }: UserEntity = await fetch(`${ENV_API_ENDPOINT}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -133,7 +133,7 @@ class AuthStateStorage {
       throw new Error("サインアップに失敗しました。")
     }
 
-    const authInfo: InsecureAuthInfo = await resp.json()
+    const authInfo: InsecureAuthInfoEntity = await resp.json()
     this.save(authInfo.uid)
   }
 

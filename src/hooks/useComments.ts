@@ -1,5 +1,5 @@
 import useSWR from "swr"
-import { Comment as CommentEntity } from "../entity-types"
+import { CommentEntity } from "../entity-types"
 
 interface Comment {
   id: string

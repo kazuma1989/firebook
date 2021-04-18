@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import useSWR from "swr"
-import { User as UserEntity } from "../entity-types"
+import { UserEntity } from "../entity-types"
 import { useMockAuth } from "./useMockAuth"
 import { User } from "./useUser"
 
