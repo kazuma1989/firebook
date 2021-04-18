@@ -41,18 +41,28 @@ class AuthStateStorage {
   currentUser: CurrentUser | null = null
 
   /**
+   * 初期化済みか否か。
+   */
+  private initialized = false
+
+  /**
    * インスタンスを初期化する。
    */
   init(): void {
+    if (this.initialized) return
+
     this.load()
+    this.initialized = true
   }
 
   /**
    * サインイン状態が変化したら通知を受け取る。
    */
   onAuthStateChanged(listener: AuthStateListener): () => void {
-    // 追加タイミングによっては通知を逃すかもしれないので、追加直後に一度通知する。
-    listener(this.currentUser)
+    if (this.initialized) {
+      // 追加タイミングによっては通知を逃すかもしれないので、追加直後に一度通知する。
+      listener(this.currentUser)
+    }
 
     this.listeners.push(listener)
 
@@ -153,9 +163,8 @@ class AuthStateStorage {
 
   private load(): void {
     const uid = sessionStorage.getItem(AuthStateStorage.STORAGE_KEY)
-    if (!uid) return
 
-    this.set({ uid })
+    this.set(uid ? { uid } : null)
   }
 
   private save(uid: string): void {
