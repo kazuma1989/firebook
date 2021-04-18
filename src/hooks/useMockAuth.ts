@@ -8,7 +8,7 @@ import { ENV_API_ENDPOINT } from "../env"
  *
  * カスタムイベントによって session storage の変更を検知している。
  */
-export function useMockAuth() {
+export function useMockAuth(): AuthStateStorage {
   useEffect(() => {
     globalAuthStateStorage.init()
   }, [])

@@ -12,7 +12,7 @@ interface UserState {
 /**
  * サインインしているユーザーのプロフィール情報をデータベースから取得する。
  */
-export function useUserState() {
+export function useUserState(): UserState {
   const { uid, loading: uidLoading } = useUID()
 
   const [userState, setUserState] = useState<UserState>({
