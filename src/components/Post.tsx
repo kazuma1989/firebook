@@ -1,7 +1,7 @@
 import { css, cx } from "@emotion/css"
 import { useRef, useState } from "react"
-import stubAuth from "../stub/auth.json"
-import stubUsers from "../stub/users.json"
+import { useAuthor } from "../hooks/useAuthor"
+import { useUser } from "../hooks/useUser"
 import { Avatar } from "./Avatar"
 import { Button } from "./Button"
 import { ButtonCircle } from "./ButtonCircle"
@@ -39,12 +39,10 @@ export function Post({
   className?: string
   style?: React.CSSProperties
 }) {
-  // TODO モック実装を本物にする。
-  const { uid } = stubAuth
+  const { uid } = useUser()
 
   const isMine = authorId === uid
-  // TODO モック実装を本物にする。
-  const author = stubUsers.find((u) => u.uid === authorId)
+  const author = useAuthor(authorId)
 
   const [menuVisible, setMenuVisible] = useState(false)
   const toggleMenu = () => {

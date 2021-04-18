@@ -17,7 +17,6 @@ import { PageSignUp } from "./pages/PageSignUp"
  * - react-router-dom の BrowserRouter.
  */
 export function App() {
-  // TODO モック実装を本物にする。
   const { user, loading } = useUserState()
 
   if (loading) {

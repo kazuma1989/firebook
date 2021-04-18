@@ -1,7 +1,6 @@
 import { css, cx } from "@emotion/css"
 import { forwardRef, useState } from "react"
-import stubAuth from "../stub/auth.json"
-import stubUsers from "../stub/users.json"
+import { useUser } from "../hooks/useUser"
 import { AutoSizingTextarea } from "./AutoSizingTextarea"
 import { Avatar } from "./Avatar"
 import { ButtonCircle } from "./ButtonCircle"
@@ -22,10 +21,7 @@ export const CommentInput = forwardRef(function CommentInput(
   },
   ref: React.ForwardedRef<HTMLTextAreaElement>
 ) {
-  // TODO モック実装を本物にする。
-  const { displayName, photoURL } = stubUsers.find(
-    (u) => u.uid === stubAuth.uid
-  )!
+  const { displayName, photoURL } = useUser()
 
   const [text, setText] = useState("")
   const valid = text.trim() !== ""

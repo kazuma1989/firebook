@@ -9,16 +9,14 @@ import { ModalBackdrop } from "../components/ModalBackdrop"
 import { PostArea } from "../components/PostArea"
 import { PostInput } from "../components/PostInput"
 import { TransparentFileInput } from "../components/TransparentFileInput"
-import stubAuth from "../stub/auth.json"
-import stubUsers from "../stub/users.json"
+import { useUser } from "../hooks/useUser"
 import { mockProgress } from "../util/mockProgress"
 
 /**
  * プロフィールページ。
  */
 export function PageProfile() {
-  // TODO モック実装を本物にする。
-  const { uid } = stubAuth
+  const { uid } = useUser()
 
   return (
     <div>
@@ -53,10 +51,7 @@ function ProfileArea({
   className?: string
   style?: React.CSSProperties
 }) {
-  // TODO モック実装を本物にする。
-  const { displayName, photoURL } = stubUsers.find(
-    (u) => u.uid === stubAuth.uid
-  )!
+  const { displayName, photoURL } = useUser()
 
   const [img, _setImg] = useState<{
     src: string

@@ -1,8 +1,7 @@
 import { css, cx } from "@emotion/css"
 import { useState } from "react"
 import { usePostDraft } from "../hooks/usePostDraft"
-import stubAuth from "../stub/auth.json"
-import stubUsers from "../stub/users.json"
+import { useUser } from "../hooks/useUser"
 import { mockProgress } from "../util/mockProgress"
 import { Avatar } from "./Avatar"
 import { DialogPostEdit } from "./DialogPostEdit"
@@ -19,10 +18,7 @@ export function PostInput({
   className?: string
   style?: React.CSSProperties
 }) {
-  // TODO モック実装を本物にする。
-  const { displayName, photoURL } = stubUsers.find(
-    (u) => u.uid === stubAuth.uid
-  )!
+  const { displayName, photoURL } = useUser()
 
   const [
     draft,
