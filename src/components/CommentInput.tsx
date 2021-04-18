@@ -11,11 +11,11 @@ import { sendIcon } from "./icon"
  */
 export const CommentInput = forwardRef(function CommentInput(
   {
-    postPath,
+    postId,
     className,
     style,
   }: {
-    postPath?: string
+    postId?: string
     className?: string
     style?: React.CSSProperties
   },
@@ -30,7 +30,7 @@ export const CommentInput = forwardRef(function CommentInput(
     setText("")
 
     // TODO モック実装を本物にする。
-    console.log({ postPath })
+    console.log({ postId })
   }
 
   return (

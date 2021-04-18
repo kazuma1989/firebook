@@ -1,6 +1,7 @@
 import { css } from "@emotion/css"
-import { useState } from "react"
-import stubUsers from "../stub/users.json"
+import { useEffect, useState } from "react"
+import { Comment as CommentEntity } from "../entity-types"
+import { ENV_API_ENDPOINT } from "../env"
 import { Comment } from "./Comment"
 import { Dialog } from "./Dialog"
 import { ModalBackdrop } from "./ModalBackdrop"
@@ -9,23 +10,28 @@ import { ModalBackdrop } from "./ModalBackdrop"
  * 投稿へのコメント一覧を表示する領域。
  */
 export function CommentArea({
-  postPath,
+  postId,
   totalComments = 0,
   className,
   style,
 }: {
-  postPath?: string
+  postId?: string
   totalComments?: number
   className?: string
   style?: React.CSSProperties
 }) {
   const [limit, setLimit] = useState(3)
-  // TODO モック実装を本物にする。
-  const [author, postId] = postPath?.split("/") ?? []
-  const post = stubUsers
-    .find((u) => u.uid === author)
-    ?.posts.find((p) => p.id === postId)
-  const comments = post?.comments.slice(-limit) ?? []
+
+  const [_comments, setComments] = useState<CommentEntity[]>([])
+  useEffect(() => {
+    fetch(`${ENV_API_ENDPOINT}/comments?postId=${postId}`)
+      .then((r) => r.json())
+      .then((comments: CommentEntity[]) => {
+        setComments(comments)
+      })
+  }, [postId])
+
+  const comments = _comments.slice(-limit) ?? []
 
   const [deletingCommentId, setDeletingCommentId] = useState("")
   const finishConfirmingDeleteComment = () => {

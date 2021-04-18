@@ -15,7 +15,7 @@ import { RelativeTime } from "./RelativeTime"
  * 投稿一つ。
  */
 export function Post({
-  path: postPath,
+  id: postId,
   author: authorId,
   text,
   imgSrc,
@@ -27,7 +27,7 @@ export function Post({
   className,
   style,
 }: {
-  path: string
+  id: string
   author?: string
   text?: string
   imgSrc?: string
@@ -276,7 +276,7 @@ export function Post({
       </div>
 
       <CommentArea
-        postPath={postPath}
+        postId={postId}
         totalComments={totalComments}
         className={css`
           margin: 8px 16px 0;
@@ -285,7 +285,7 @@ export function Post({
 
       <CommentInput
         ref={commentInput$}
-        postPath={postPath}
+        postId={postId}
         className={css`
           margin: 0 16px 8px;
         `}

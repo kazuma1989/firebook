@@ -1,7 +1,8 @@
 import { css } from "@emotion/css"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { Post as PostEntity } from "../entity-types"
+import { ENV_API_ENDPOINT } from "../env"
 import { usePostDraft } from "../hooks/usePostDraft"
-import stubUsers from "../stub/users.json"
 import { mockProgress } from "../util/mockProgress"
 import { Dialog } from "./Dialog"
 import { DialogPostEdit } from "./DialogPostEdit"
@@ -20,19 +21,17 @@ export function PostArea({
   className?: string
   style?: React.CSSProperties
 }) {
-  // TODO モック実装を本物にする。
-  const posts = (targetUID
-    ? stubUsers.find((u) => u.uid === targetUID)?.posts ?? []
-    : stubUsers.flatMap((u) => u.posts)
-  )
-    .map((post) => ({
-      ...post,
-      path: `${post.author}/${post.id}`,
-    }))
-    .sort((p1, p2) => p2.postedAt - p1.postedAt)
+  const [posts, setPosts] = useState<PostEntity[]>([])
+  useEffect(() => {
+    fetch(`${ENV_API_ENDPOINT}/posts${targetUID ? `?author=${targetUID}` : ""}`)
+      .then((r) => r.json())
+      .then((posts: PostEntity[]) => {
+        setPosts(posts.sort((p1, p2) => p2.postedAt - p1.postedAt))
+      })
+  }, [targetUID])
 
   const [deletingState, setDeletingState] = useState<{
-    postPath: string
+    postId: string
     hasImg: boolean
   } | null>(null)
   const stopDeleting = () => {
@@ -40,7 +39,7 @@ export function PostArea({
   }
 
   const [editingState, setEditingState] = useState<{
-    postPath: string
+    postId: string
     initialText?: string
     initialImgSrc?: string
   } | null>(null)
@@ -53,7 +52,6 @@ export function PostArea({
       {posts.map(
         ({
           id: postId,
-          path: postPath,
           author,
           text,
           imgSrc,
@@ -64,7 +62,7 @@ export function PostArea({
           return (
             <Post
               key={postId}
-              path={postPath}
+              id={postId}
               author={author}
               text={text}
               imgSrc={imgSrc}
@@ -73,14 +71,14 @@ export function PostArea({
               totalComments={totalComments}
               onEdit={() => {
                 setEditingState({
-                  postPath,
+                  postId,
                   initialText: text,
                   initialImgSrc: imgSrc,
                 })
               }}
               onDelete={() => {
                 setDeletingState({
-                  postPath,
+                  postId,
                   hasImg: Boolean(imgSrc),
                 })
               }}
@@ -110,7 +108,7 @@ export function PostArea({
 
       {editingState && (
         <EditModal
-          postPath={editingState.postPath}
+          postId={editingState.postId}
           initialText={editingState.initialText}
           initialImgSrc={editingState.initialImgSrc}
           onCancel={clearEditingState}
@@ -162,14 +160,14 @@ function DeleteConfirmationDialog({
  * ダイアログだけ切り出して、文字入力でも UI がカクつかないように対策する。
  */
 function EditModal({
-  postPath,
+  postId,
   initialText = "",
   initialImgSrc,
   onCancel,
   onDiscard,
   onFinish,
 }: {
-  postPath: string
+  postId: string
   initialText?: string
   initialImgSrc?: string
   onCancel?(): void
@@ -229,7 +227,7 @@ function EditModal({
 
           // TODO モック実装を本物にする。
           await mockProgress(setImgUploadProgress)
-          console.log({ postPath })
+          console.log({ postId })
 
           resetAll()
           onFinish?.()
