@@ -15,22 +15,27 @@ interface Comment {
 export function useComments(
   postId: string | undefined,
   page: number
-): Comment[] {
-  const { data: pagedComments, size, setSize } = useSWRInfinite<
+): [comments: Comment[], revalidate: () => Promise<boolean>] {
+  const { data: pagedComments, size, setSize, revalidate } = useSWRInfinite<
     CommentEntity[]
-  >((pageIndex, previousPageData) => {
-    if (!postId) {
-      return null
-    }
-    if (previousPageData?.length === 0) {
-      // 最終ページに達した。
-      return null
-    }
+  >(
+    (pageIndex, previousPageData) => {
+      if (!postId) {
+        return null
+      }
+      if (previousPageData?.length === 0) {
+        // 最終ページに達した。
+        return null
+      }
 
-    return `/comments?postId=${postId}&_sort=postedAt&_order=desc&_limit=3&_page=${
-      pageIndex + 1
-    }`
-  })
+      return `/comments?postId=${postId}&_sort=postedAt&_order=desc&_limit=3&_page=${
+        pageIndex + 1
+      }`
+    },
+    {
+      revalidateAll: true,
+    }
+  )
 
   useEffect(() => {
     if (page === size) return
@@ -38,5 +43,5 @@ export function useComments(
     setSize(page)
   }, [page, setSize, size])
 
-  return pagedComments?.flat() ?? []
+  return [pagedComments?.flat() ?? [], revalidate]
 }

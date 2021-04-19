@@ -1,5 +1,6 @@
 import { css } from "@emotion/css"
 import { useState } from "react"
+import { ENV_API_ENDPOINT } from "../env"
 import { useComments } from "../hooks/useComments"
 import { Comment } from "./Comment"
 import { Dialog } from "./Dialog"
@@ -26,7 +27,8 @@ export function CommentArea({
 
   // 投稿時刻降順で取得したものの順序を反転することで、
   // 最新のコメントを取得しつつ新しいものを下に表示するということが可能
-  const comments = [...useComments(postId, page)].reverse()
+  const [_comments, revalidate] = useComments(postId, page)
+  const comments = [..._comments].reverse()
 
   const [deletingCommentId, setDeletingCommentId] = useState("")
   const finishConfirmingDeleteComment = () => {
@@ -83,7 +85,12 @@ export function CommentArea({
             onSubmit={async () => {
               finishConfirmingDeleteComment()
 
-              // TODO モック実装を本物にする。
+              // TODO ENV_API_ENDPOINT はラッパー使ってなくしてもいいかも。
+              await fetch(`${ENV_API_ENDPOINT}/comments/${deletingCommentId}`, {
+                method: "DELETE",
+              })
+
+              revalidate()
             }}
           />
         </ModalBackdrop>
