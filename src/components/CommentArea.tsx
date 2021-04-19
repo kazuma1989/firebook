@@ -19,8 +19,14 @@ export function CommentArea({
   className?: string
   style?: React.CSSProperties
 }) {
-  const [limit, setLimit] = useState(3)
-  const comments = useComments(postId, limit)
+  const [page, setPage] = useState(1)
+  const nextPage = () => {
+    setPage((v) => v + 1)
+  }
+
+  // 投稿時刻降順で取得したものの順序を反転することで、
+  // 最新のコメントを取得しつつ新しいものを下に表示するということが可能
+  const comments = [...useComments(postId, page)].reverse()
 
   const [deletingCommentId, setDeletingCommentId] = useState("")
   const finishConfirmingDeleteComment = () => {
@@ -32,9 +38,7 @@ export function CommentArea({
       {comments.length < totalComments && (
         <button
           type="button"
-          onClick={() => {
-            setLimit((v) => v + 3)
-          }}
+          onClick={nextPage}
           className={css`
             width: 100%;
             margin-bottom: 4px;
