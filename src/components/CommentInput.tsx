@@ -1,5 +1,6 @@
 import { css, cx } from "@emotion/css"
 import { forwardRef, useState } from "react"
+import { useComments } from "../hooks/useComments"
 import { useUser } from "../hooks/useUser"
 import { AutoSizingTextarea } from "./AutoSizingTextarea"
 import { Avatar } from "./Avatar"
@@ -21,7 +22,9 @@ export const CommentInput = forwardRef(function CommentInput(
   },
   ref: React.ForwardedRef<HTMLTextAreaElement>
 ) {
-  const { displayName, photoURL } = useUser()
+  const { uid, displayName, photoURL } = useUser()
+
+  const [, { add }] = useComments(postId, 0)
 
   const [text, setText] = useState("")
   const valid = text.trim() !== ""
@@ -29,8 +32,10 @@ export const CommentInput = forwardRef(function CommentInput(
   const submit = async () => {
     setText("")
 
-    // TODO モック実装を本物にする。
-    console.log({ postId })
+    add({
+      author: uid,
+      text,
+    })
   }
 
   return (

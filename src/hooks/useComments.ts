@@ -1,6 +1,6 @@
-import { useEffect } from "react"
-import { useSWRInfinite } from "swr"
-import { CommentEntity } from "../entity-types"
+import useSWR from "swr"
+import { CommentEntity, PostEntity } from "../entity-types"
+import { ENV_API_ENDPOINT } from "../env"
 
 interface Comment {
   id: string
@@ -14,34 +14,110 @@ interface Comment {
  */
 export function useComments(
   postId: string | undefined,
-  page: number
-): [comments: Comment[], revalidate: () => Promise<boolean>] {
-  const { data: pagedComments, size, setSize, revalidate } = useSWRInfinite<
-    CommentEntity[]
-  >(
-    (pageIndex, previousPageData) => {
-      if (!postId) {
-        return null
-      }
-      if (previousPageData?.length === 0) {
-        // 最終ページに達した。
-        return null
-      }
+  limit: number
+): [
+  Comment[],
+  {
+    add(input: Pick<Comment, "author" | "text">): Promise<void>
+    remove(id: string): Promise<void>
+  }
+] {
+  const post$ = useSWR<PostEntity>(`/posts/${postId}`)
+  const comments$ = useSWR<CommentEntity[]>(`/comments?postId=${postId}`)
 
-      return `/comments?postId=${postId}&_sort=postedAt&_order=desc&_limit=3&_page=${
-        pageIndex + 1
-      }`
-    },
+  return [
+    comments$.data?.slice(-limit).reverse() ?? [],
+
     {
-      revalidateAll: true,
-    }
-  )
+      async add(input) {
+        const comment: Partial<CommentEntity> = {
+          ...input,
+          postId,
+          postedAt: Date.now(),
+        }
 
-  useEffect(() => {
-    if (page === size) return
+        const resp = await fetch(`${ENV_API_ENDPOINT}/comments`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(comment),
+        })
+        if (!resp.ok) {
+          throw new Error(
+            `${resp.status} ${resp.statusText} ${await resp.text()}`
+          )
+        }
 
-    setSize(page)
-  }, [page, setSize, size])
+        const created: CommentEntity = await resp.json()
+        const comments = await comments$.mutate(
+          (comments) => [...(comments ?? []), created],
+          false
+        )
 
-  return [pagedComments?.flat() ?? [], revalidate]
+        if (!comments) return
+
+        const patch: Partial<PostEntity> = {
+          totalComments: comments.length,
+        }
+        const resp2 = await fetch(`${ENV_API_ENDPOINT}/posts/${postId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(patch),
+        })
+        if (!resp2.ok) {
+          throw new Error()
+        }
+
+        post$.mutate(
+          (post) => ({
+            ...post!,
+            ...patch,
+          }),
+          false
+        )
+      },
+
+      async remove(id) {
+        const resp = await fetch(`${ENV_API_ENDPOINT}/comments/${id}`, {
+          method: "DELETE",
+        })
+        if (!resp.ok) {
+          throw new Error(
+            `${resp.status} ${resp.statusText} ${await resp.text()}`
+          )
+        }
+
+        const comments = await comments$.mutate(
+          (comments) => comments?.filter((c) => c.id !== id),
+          false
+        )
+        if (!comments) return
+
+        const patch: Partial<PostEntity> = {
+          totalComments: comments.length,
+        }
+        const resp2 = await fetch(`${ENV_API_ENDPOINT}/posts/${postId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(patch),
+        })
+        if (!resp2.ok) {
+          throw new Error()
+        }
+
+        post$.mutate(
+          (post) => ({
+            ...post!,
+            ...patch,
+          }),
+          false
+        )
+      },
+    },
+  ]
 }
