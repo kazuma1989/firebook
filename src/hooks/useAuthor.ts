@@ -10,9 +10,13 @@ interface Author {
  * 投稿者の情報を非同期で取得する。
  */
 export function useAuthor(authorId: string | undefined): Author | undefined {
-  const { data: user } = useSWR<UserEntity>(
-    authorId ? `/users/${authorId}` : null
-  )
+  const user$ = useSWR<UserEntity>(authorId ? `/users/${authorId}` : null)
+  if (!user$.data) return
 
-  return user
+  const { displayName, photoURL } = user$.data
+
+  return {
+    displayName,
+    photoURL: photoURL ?? undefined,
+  }
 }

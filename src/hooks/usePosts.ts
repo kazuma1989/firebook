@@ -21,5 +21,18 @@ export function usePosts(targetUID: string | undefined, limit: number): Post[] {
     targetUID ? `/posts?author=${targetUID}` : "/posts"
   )
 
-  return posts$.data?.slice(-limit).reverse() ?? []
+  return (
+    posts$.data
+      ?.slice(-limit)
+      .map(({ id, author, text, imgSrc, postedAt, likes, totalComments }) => ({
+        id,
+        author,
+        text: text ?? undefined,
+        imgSrc: imgSrc ?? undefined,
+        postedAt,
+        likes,
+        totalComments,
+      }))
+      .reverse() ?? []
+  )
 }

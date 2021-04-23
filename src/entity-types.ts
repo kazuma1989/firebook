@@ -19,7 +19,7 @@ export interface InsecureAuthInfoEntity extends Entity {
  */
 export interface UserEntity extends Entity {
   displayName: string
-  photoURL?: string
+  photoURL: string | null
 }
 
 /**
@@ -27,8 +27,8 @@ export interface UserEntity extends Entity {
  */
 export interface PostEntity extends Entity {
   author: string
-  text?: string
-  imgSrc?: string
+  text: string | null
+  imgSrc: string | null
   postedAt: number
   likes: string[]
   totalComments: number

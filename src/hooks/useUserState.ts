@@ -15,23 +15,26 @@ interface UserState {
 export function useUserState(): UserState {
   const authState = useAuthState()
 
-  const { data, error } = useSWR<UserEntity>(
+  const user$ = useSWR<UserEntity>(
     !authState.loading && authState.uid ? `/users/${authState.uid}` : null
   )
 
-  if (error) {
+  if (user$.error) {
     return {
       loading: false,
       user: null,
     }
   }
 
-  if (data) {
+  if (user$.data) {
+    const { id, displayName, photoURL } = user$.data
+
     return {
       loading: false,
       user: {
-        ...data,
-        uid: data.id,
+        uid: id,
+        displayName,
+        photoURL: photoURL ?? undefined,
       },
     }
   }

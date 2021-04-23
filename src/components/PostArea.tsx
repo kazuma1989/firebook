@@ -228,8 +228,8 @@ function EditModal({
           await mockProgress(setImgUploadProgress)
 
           await apiPosts.update(postId, {
-            imgSrc: draft.img?.src,
             text: draft.text,
+            imgSrc: draft.img?.src ?? null,
           })
 
           await mutate(targetUID ? `/posts?author=${targetUID}` : "/posts")
