@@ -20,7 +20,7 @@ export function PostArea({
   className?: string
   style?: React.CSSProperties
 }) {
-  const posts = usePosts(targetUID, 15)
+  const [posts, { remove }] = usePosts(targetUID, 15)
 
   const [deletingState, setDeletingState] = useState<{
     postId: string
@@ -92,7 +92,7 @@ export function PostArea({
             onSubmit={async () => {
               stopDeleting()
 
-              // TODO モック実装を本物にする。
+              await remove(deletingState.postId)
             }}
           />
         </ModalBackdrop>
@@ -171,6 +171,8 @@ function EditModal({
     { setText, resetText, resetImg, setImgFile, setImgUploadProgress },
   ] = usePostDraft(initialText, initialImgSrc)
 
+  const [, { update }] = usePosts(undefined, 0)
+
   const [submitting, setSubmitting] = useState(false)
   const [confirming, setConfirming] = useState(false)
   const stopConfirming = () => {
@@ -219,7 +221,12 @@ function EditModal({
 
           // TODO モック実装を本物にする。
           await mockProgress(setImgUploadProgress)
-          console.log({ postId })
+
+          await update({
+            id: postId,
+            imgSrc: draft.img?.src,
+            text: draft.text,
+          })
 
           resetAll()
           onFinish?.()
