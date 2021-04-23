@@ -1,7 +1,9 @@
 import { css, cx } from "@emotion/css"
 import { useState } from "react"
+import { mutate } from "swr"
 import { usePostDraft } from "../hooks/usePostDraft"
 import { useUser } from "../hooks/useUser"
+import * as apiPosts from "../util/apiPosts"
 import { mockProgress } from "../util/mockProgress"
 import { Avatar } from "./Avatar"
 import { DialogPostEdit } from "./DialogPostEdit"
@@ -12,13 +14,15 @@ import { ModalBackdrop } from "./ModalBackdrop"
  * クリックするとダイアログが開く。
  */
 export function PostInput({
+  targetUID,
   className,
   style,
 }: {
+  targetUID?: string
   className?: string
   style?: React.CSSProperties
 }) {
-  const { displayName, photoURL } = useUser()
+  const { uid, displayName, photoURL } = useUser()
 
   const [
     draft,
@@ -118,6 +122,17 @@ export function PostInput({
 
             // TODO モック実装を本物にする。
             await mockProgress(setImgUploadProgress)
+
+            await apiPosts.add({
+              author: uid,
+              text: draft.text,
+              imgSrc: draft.img?.src,
+              postedAt: Date.now(),
+              likes: [],
+              totalComments: 0,
+            })
+
+            await mutate(targetUID ? `/posts?author=${targetUID}` : "/posts")
 
             closeDialog()
             resetAll()

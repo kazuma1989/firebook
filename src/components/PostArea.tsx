@@ -1,7 +1,9 @@
 import { css } from "@emotion/css"
 import { useState } from "react"
+import { mutate } from "swr"
 import { usePostDraft } from "../hooks/usePostDraft"
 import { usePosts } from "../hooks/usePosts"
+import * as apiPosts from "../util/apiPosts"
 import { mockProgress } from "../util/mockProgress"
 import { Dialog } from "./Dialog"
 import { DialogPostEdit } from "./DialogPostEdit"
@@ -20,7 +22,7 @@ export function PostArea({
   className?: string
   style?: React.CSSProperties
 }) {
-  const [posts, { remove }] = usePosts(targetUID, 15)
+  const posts = usePosts(targetUID, 15)
 
   const [deletingState, setDeletingState] = useState<{
     postId: string
@@ -92,7 +94,9 @@ export function PostArea({
             onSubmit={async () => {
               stopDeleting()
 
-              await remove(deletingState.postId)
+              await apiPosts.remove(deletingState.postId)
+
+              await mutate(targetUID ? `/posts?author=${targetUID}` : "/posts")
             }}
           />
         </ModalBackdrop>
@@ -100,6 +104,7 @@ export function PostArea({
 
       {editingState && (
         <EditModal
+          targetUID={targetUID}
           postId={editingState.postId}
           initialText={editingState.initialText}
           initialImgSrc={editingState.initialImgSrc}
@@ -152,6 +157,7 @@ function DeleteConfirmationDialog({
  * ダイアログだけ切り出して、文字入力でも UI がカクつかないように対策する。
  */
 function EditModal({
+  targetUID,
   postId,
   initialText = "",
   initialImgSrc,
@@ -159,6 +165,7 @@ function EditModal({
   onDiscard,
   onFinish,
 }: {
+  targetUID?: string
   postId: string
   initialText?: string
   initialImgSrc?: string
@@ -170,8 +177,6 @@ function EditModal({
     draft,
     { setText, resetText, resetImg, setImgFile, setImgUploadProgress },
   ] = usePostDraft(initialText, initialImgSrc)
-
-  const [, { update }] = usePosts(undefined, 0)
 
   const [submitting, setSubmitting] = useState(false)
   const [confirming, setConfirming] = useState(false)
@@ -222,11 +227,12 @@ function EditModal({
           // TODO モック実装を本物にする。
           await mockProgress(setImgUploadProgress)
 
-          await update({
-            id: postId,
+          await apiPosts.update(postId, {
             imgSrc: draft.img?.src,
             text: draft.text,
           })
+
+          await mutate(targetUID ? `/posts?author=${targetUID}` : "/posts")
 
           resetAll()
           onFinish?.()
