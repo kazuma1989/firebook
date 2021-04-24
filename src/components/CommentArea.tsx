@@ -1,8 +1,6 @@
 import { css } from "@emotion/css"
 import { useState } from "react"
-import { mutate } from "swr"
-import { useComments } from "../hooks/useComments"
-import * as apiComments from "../util/apiComments"
+import { removeComment, useComments } from "../hooks/useComments"
 import { Comment } from "./Comment"
 import { Dialog } from "./Dialog"
 import { ModalBackdrop } from "./ModalBackdrop"
@@ -16,7 +14,7 @@ export function CommentArea({
   className,
   style,
 }: {
-  postId?: string
+  postId: string
   totalComments?: number
   className?: string
   style?: React.CSSProperties
@@ -85,12 +83,7 @@ export function CommentArea({
             onSubmit={async () => {
               finishConfirmingDeleteComment()
 
-              await apiComments.remove(deletingCommentId)
-
-              await Promise.all([
-                mutate("/posts"),
-                mutate(`/comments?postId=${postId}`),
-              ])
+              await removeComment(deletingCommentId, postId)
             }}
           />
         </ModalBackdrop>

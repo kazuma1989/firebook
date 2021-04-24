@@ -1,8 +1,7 @@
 import { css, cx } from "@emotion/css"
 import { forwardRef, useState } from "react"
-import { mutate } from "swr"
+import { addComment } from "../hooks/useComments"
 import { useUser } from "../hooks/useUser"
-import * as apiComments from "../util/apiComments"
 import { AutoSizingTextarea } from "./AutoSizingTextarea"
 import { Avatar } from "./Avatar"
 import { ButtonCircle } from "./ButtonCircle"
@@ -17,7 +16,7 @@ export const CommentInput = forwardRef(function CommentInput(
     className,
     style,
   }: {
-    postId?: string
+    postId: string
     className?: string
     style?: React.CSSProperties
   },
@@ -31,14 +30,12 @@ export const CommentInput = forwardRef(function CommentInput(
   const submit = async () => {
     setText("")
 
-    await apiComments.add({
+    await addComment({
       postId,
       author: uid,
       text,
       postedAt: Date.now(),
     })
-
-    await Promise.all([mutate("/posts"), mutate(`/comments?postId=${postId}`)])
   }
 
   return (
