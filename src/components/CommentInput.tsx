@@ -38,7 +38,7 @@ export const CommentInput = forwardRef(function CommentInput(
       postedAt: Date.now(),
     })
 
-    await Promise.all([mutate(`/posts`), mutate(`/comments?postId=${postId}`)])
+    await Promise.all([mutate("/posts"), mutate(`/comments?postId=${postId}`)])
   }
 
   return (

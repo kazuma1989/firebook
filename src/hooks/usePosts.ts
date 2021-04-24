@@ -17,13 +17,16 @@ interface Post {
  * targetUID の指定があるときはそのユーザーの投稿だけを、指定がないときは全部の投稿を表示する。
  */
 export function usePosts(targetUID: string | undefined, limit: number): Post[] {
-  const posts$ = useSWR<PostEntity[]>(
-    targetUID ? `/posts?author=${targetUID}` : "/posts"
-  )
+  const posts$ = useSWR<PostEntity[]>("/posts")
+
+  const posts =
+    (targetUID
+      ? posts$.data?.filter((p) => p.author === targetUID)
+      : posts$.data) ?? []
 
   return (
-    posts$.data
-      ?.slice(-limit)
+    posts
+      .slice(-limit)
       .map(({ id, author, text, imgSrc, postedAt, likes, totalComments }) => ({
         id,
         author,

@@ -30,7 +30,6 @@ export function PageProfile() {
         `}
       >
         <PostInput
-          targetUID={uid}
           className={css`
             margin: 16px 0;
           `}

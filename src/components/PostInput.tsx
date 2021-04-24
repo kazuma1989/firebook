@@ -14,11 +14,9 @@ import { ModalBackdrop } from "./ModalBackdrop"
  * クリックするとダイアログが開く。
  */
 export function PostInput({
-  targetUID,
   className,
   style,
 }: {
-  targetUID?: string
   className?: string
   style?: React.CSSProperties
 }) {
@@ -132,7 +130,7 @@ export function PostInput({
               totalComments: 0,
             })
 
-            await mutate(targetUID ? `/posts?author=${targetUID}` : "/posts")
+            await mutate("/posts")
 
             closeDialog()
             resetAll()

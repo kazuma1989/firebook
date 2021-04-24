@@ -96,7 +96,7 @@ export function PostArea({
 
               await apiPosts.remove(deletingState.postId)
 
-              await mutate(targetUID ? `/posts?author=${targetUID}` : "/posts")
+              await mutate("/posts")
             }}
           />
         </ModalBackdrop>
@@ -104,7 +104,6 @@ export function PostArea({
 
       {editingState && (
         <EditModal
-          targetUID={targetUID}
           postId={editingState.postId}
           initialText={editingState.initialText}
           initialImgSrc={editingState.initialImgSrc}
@@ -157,7 +156,6 @@ function DeleteConfirmationDialog({
  * ダイアログだけ切り出して、文字入力でも UI がカクつかないように対策する。
  */
 function EditModal({
-  targetUID,
   postId,
   initialText = "",
   initialImgSrc,
@@ -165,7 +163,6 @@ function EditModal({
   onDiscard,
   onFinish,
 }: {
-  targetUID?: string
   postId: string
   initialText?: string
   initialImgSrc?: string
@@ -232,7 +229,7 @@ function EditModal({
             imgSrc: draft.img?.src ?? null,
           })
 
-          await mutate(targetUID ? `/posts?author=${targetUID}` : "/posts")
+          await mutate("/posts")
 
           resetAll()
           onFinish?.()

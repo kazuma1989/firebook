@@ -88,7 +88,7 @@ export function CommentArea({
               await apiComments.remove(deletingCommentId)
 
               await Promise.all([
-                mutate(`/posts`),
+                mutate("/posts"),
                 mutate(`/comments?postId=${postId}`),
               ])
             }}
