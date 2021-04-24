@@ -1,9 +1,8 @@
 import { css, cx } from "@emotion/css"
 import { useState } from "react"
-import { mutate } from "swr"
 import { usePostDraft } from "../hooks/usePostDraft"
+import { addPost } from "../hooks/usePosts"
 import { useUser } from "../hooks/useUser"
-import * as apiPosts from "../util/apiPosts"
 import { mockProgress } from "../util/mockProgress"
 import { Avatar } from "./Avatar"
 import { DialogPostEdit } from "./DialogPostEdit"
@@ -121,16 +120,14 @@ export function PostInput({
             // TODO モック実装を本物にする。
             await mockProgress(setImgUploadProgress)
 
-            await apiPosts.add({
+            await addPost({
               author: uid,
               text: draft.text,
-              imgSrc: draft.img?.src,
+              imgSrc: draft.img?.src ?? null,
               postedAt: Date.now(),
               likes: [],
               totalComments: 0,
             })
-
-            await mutate("/posts")
 
             closeDialog()
             resetAll()

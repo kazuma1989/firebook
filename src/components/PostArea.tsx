@@ -1,9 +1,7 @@
 import { css } from "@emotion/css"
 import { useState } from "react"
-import { mutate } from "swr"
 import { usePostDraft } from "../hooks/usePostDraft"
-import { usePosts } from "../hooks/usePosts"
-import * as apiPosts from "../util/apiPosts"
+import { removePost, updatePost, usePosts } from "../hooks/usePosts"
 import { mockProgress } from "../util/mockProgress"
 import { Dialog } from "./Dialog"
 import { DialogPostEdit } from "./DialogPostEdit"
@@ -94,9 +92,7 @@ export function PostArea({
             onSubmit={async () => {
               stopDeleting()
 
-              await apiPosts.remove(deletingState.postId)
-
-              await mutate("/posts")
+              await removePost(deletingState.postId)
             }}
           />
         </ModalBackdrop>
@@ -224,12 +220,10 @@ function EditModal({
           // TODO モック実装を本物にする。
           await mockProgress(setImgUploadProgress)
 
-          await apiPosts.update(postId, {
+          await updatePost(postId, {
             text: draft.text,
             imgSrc: draft.img?.src ?? null,
           })
-
-          await mutate("/posts")
 
           resetAll()
           onFinish?.()
