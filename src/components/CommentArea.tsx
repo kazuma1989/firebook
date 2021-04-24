@@ -1,6 +1,8 @@
 import { css } from "@emotion/css"
 import { useState } from "react"
+import { mutate } from "swr"
 import { useComments } from "../hooks/useComments"
+import * as apiComments from "../util/apiComments"
 import { Comment } from "./Comment"
 import { Dialog } from "./Dialog"
 import { ModalBackdrop } from "./ModalBackdrop"
@@ -26,8 +28,7 @@ export function CommentArea({
 
   // 投稿時刻降順で取得したものの順序を反転することで、
   // 最新のコメントを取得しつつ新しいものを下に表示するということが可能
-  const [_comments, { remove }] = useComments(postId, limit)
-  const comments = [..._comments].reverse()
+  const comments = [...useComments(postId, limit)].reverse()
 
   const [deletingCommentId, setDeletingCommentId] = useState("")
   const finishConfirmingDeleteComment = () => {
@@ -84,7 +85,9 @@ export function CommentArea({
             onSubmit={async () => {
               finishConfirmingDeleteComment()
 
-              await remove(deletingCommentId)
+              await apiComments.remove(deletingCommentId)
+
+              await mutate(`/comments?postId=${postId}`)
             }}
           />
         </ModalBackdrop>

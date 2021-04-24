@@ -1,7 +1,8 @@
 import { css, cx } from "@emotion/css"
 import { forwardRef, useState } from "react"
-import { useComments } from "../hooks/useComments"
+import { mutate } from "swr"
 import { useUser } from "../hooks/useUser"
+import * as apiComments from "../util/apiComments"
 import { AutoSizingTextarea } from "./AutoSizingTextarea"
 import { Avatar } from "./Avatar"
 import { ButtonCircle } from "./ButtonCircle"
@@ -24,18 +25,20 @@ export const CommentInput = forwardRef(function CommentInput(
 ) {
   const { uid, displayName, photoURL } = useUser()
 
-  const [, { add }] = useComments(postId, 0)
-
   const [text, setText] = useState("")
   const valid = text.trim() !== ""
 
   const submit = async () => {
     setText("")
 
-    add({
+    await apiComments.add({
+      postId,
       author: uid,
       text,
+      postedAt: Date.now(),
     })
+
+    await mutate(`/comments?postId=${postId}`)
   }
 
   return (
