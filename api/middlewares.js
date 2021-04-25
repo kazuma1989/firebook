@@ -39,32 +39,27 @@ function totalComments() {
   return async (req, res, next) => {
     const lowdb = req.app.db
 
-    switch (req.method) {
-      case "POST": {
-        if (req.url === "/comments") {
-          const comment = req.body
+    if (req.method === "POST" && req.path === "/comments") {
+      const comment = req.body
 
-          await lowdb
-            .get("posts")
-            .find({ id: comment.postId })
-            .update("totalComments", (v) => v + 1)
-            .write()
-        }
-        break
-      }
+      await lowdb
+        .get("posts")
+        .find({ id: comment.postId })
+        .update("totalComments", (v) => v + 1)
+        .write()
+    }
 
-      case "DELETE": {
-        const [, id] = req.url.match(/\/comments\/([^/]+)$/) || []
-        if (id) {
-          const comment = lowdb.get("comments").find({ id }).value()
+    if (req.method === "DELETE" && req.path.startsWith("/comments/")) {
+      // /comments/:id -> "", "comments", ":id"
+      const [, , id] = req.path.split("/")
+      if (id) {
+        const comment = lowdb.get("comments").find({ id }).value()
 
-          await lowdb
-            .get("posts")
-            .find({ id: comment.postId })
-            .update("totalComments", (v) => v - 1)
-            .write()
-        }
-        break
+        await lowdb
+          .get("posts")
+          .find({ id: comment.postId })
+          .update("totalComments", (v) => v - 1)
+          .write()
       }
     }
 
@@ -88,32 +83,28 @@ const mimeTypes = {
  */
 function storage(url, dir) {
   return async (req, res, next) => {
-    switch (req.method) {
-      case "POST": {
-        if (req.path === url) {
-          const [extname] =
-            Object.entries(mimeTypes).find(([, mimeType]) =>
-              req.headers["content-type"].startsWith(mimeType)
-            ) || []
-          if (!extname) break
+    if (req.method === "POST" && req.path === url) {
+      const [extname] =
+        Object.entries(mimeTypes).find(([, mimeType]) =>
+          req.headers["content-type"].startsWith(mimeType)
+        ) || []
 
-          const filename = `${Date.now()}${extname}`
+      if (extname) {
+        const filename = `${Date.now()}${extname}`
 
-          await new Promise((resolve, reject) => {
-            req
-              .pipe(fs.createWriteStream(path.join(dir, filename)))
-              .once("finish", resolve)
-              .once("error", reject)
-          })
+        await new Promise((resolve, reject) => {
+          req
+            .pipe(fs.createWriteStream(path.join(dir, filename)))
+            .once("finish", resolve)
+            .once("error", reject)
+        })
 
-          res.status(201).json({
-            downloadURL: `${req.protocol}://${req.get(
-              "host"
-            )}${url}/${filename}`,
-          })
-          return
-        }
-        break
+        const origin = `${req.protocol}://${req.get("host")}`
+
+        res.status(201).json({
+          downloadURL: `${origin}${url}/${filename}`,
+        })
+        return
       }
     }
 
