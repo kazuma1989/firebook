@@ -4,17 +4,21 @@ const path = require("path")
 /**
  * [JSON Server](https://github.com/typicode/json-server) のミドルウェア。
  *
+ * @example
+ * npx json-server --middlewares middleware.js
+ *
  * @typedef {any} Request
  * @typedef {any} Response
  * @typedef {() => void} NextFunction
  * @typedef {(req: Request, res: Response, next: NextFunction) => void} Middleware
  */
-
-module.exports = [
+const middlewares = [
   latency(1000, 100),
   totalComments(),
   storage("/_storage", path.resolve(process.cwd(), "_storage")),
 ]
+
+module.exports = middlewares
 
 /**
  * ランダムなレイテンシーを再現する。
@@ -67,45 +71,67 @@ function totalComments() {
   }
 }
 
-const mimeTypes = {
-  ".png": "image/png",
-  ".jpg": "image/jpg",
-  ".jpeg": "image/jpg",
-  ".gif": "image/gif",
-}
-
 /**
- * ファイルをアップロードする。
+ * ファイルをアップロード／ダウンロードするエンドポイントを追加する。
  *
- * @param {string} url
- * @param {string} dir
+ * @param {string} urlPath エンドポイントの URL パス
+ * @param {string} dir ファイルを保存／取得するディレクトリ
  * @return {Middleware}
  */
-function storage(url, dir) {
+function storage(urlPath, dir) {
+  const mimeTypes = {
+    ".png": "image/png",
+    ".jpg": "image/jpg",
+    ".jpeg": "image/jpg",
+    ".gif": "image/gif",
+  }
+
   return async (req, res, next) => {
-    if (req.method === "POST" && req.path === url) {
+    if (req.method === "GET" && req.path.startsWith(`${urlPath}/`)) {
+      // /url/:filename -> "", "url", ":filename"
+      const [, , filename] = req.path.split("/")
+      const filePath = path.join(dir, path.normalize(filename))
+      const mimeType = mimeTypes[path.extname(filePath).toLowerCase()]
+
+      res.setHeader("Content-Type", mimeType || "application/octet-stream")
+
+      try {
+        await new Promise((resolve, reject) => {
+          fs.createReadStream(filePath)
+            .once("error", reject)
+            .pipe(res)
+            .once("finish", resolve)
+        })
+      } catch (error) {
+        res.status(404).send()
+      }
+      return
+    }
+
+    if (req.method === "POST" && req.path === urlPath) {
       const [extname] =
         Object.entries(mimeTypes).find(([, mimeType]) =>
           req.headers["content-type"].startsWith(mimeType)
         ) || []
-
-      if (extname) {
-        const filename = `${Date.now()}${extname}`
-
-        await new Promise((resolve, reject) => {
-          req
-            .pipe(fs.createWriteStream(path.join(dir, filename)))
-            .once("finish", resolve)
-            .once("error", reject)
-        })
-
-        const origin = `${req.protocol}://${req.get("host")}`
-
-        res.status(201).json({
-          downloadURL: `${origin}${url}/${filename}`,
-        })
+      if (!extname) {
+        res.status(415).send()
         return
       }
+
+      const filePath = path.join(dir, `${Date.now()}${extname}`)
+      await new Promise((resolve, reject) => {
+        req
+          .pipe(fs.createWriteStream(filePath))
+          .once("finish", resolve)
+          .once("error", reject)
+      })
+
+      const origin = `${req.protocol}://${req.get("host")}`
+      const downloadURL = `${origin}${urlPath}/${path.basename(filePath)}`
+      res.status(201).json({
+        downloadURL,
+      })
+      return
     }
 
     next()
