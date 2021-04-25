@@ -20,43 +20,6 @@ const middlewares = [
 module.exports = middlewares
 
 /**
- * コメント投稿に伴って投稿の totalComments を増減させる。
- *
- * @return {Middleware}
- */
-function totalComments() {
-  return async (req, res, next) => {
-    const lowdb = req.app.db
-
-    if (req.method === "POST" && req.path === "/comments") {
-      const comment = req.body
-
-      await lowdb
-        .get("posts")
-        .find({ id: comment.postId })
-        .update("totalComments", (v) => v + 1)
-        .write()
-    }
-
-    if (req.method === "DELETE" && req.path.startsWith("/comments/")) {
-      // /comments/:id -> "", "comments", ":id"
-      const [, , id] = req.path.split("/")
-      if (id) {
-        const comment = lowdb.get("comments").find({ id }).value()
-
-        await lowdb
-          .get("posts")
-          .find({ id: comment.postId })
-          .update("totalComments", (v) => v - 1)
-          .write()
-      }
-    }
-
-    next()
-  }
-}
-
-/**
  * ファイルをアップロード／ダウンロードするエンドポイントを追加する。
  *
  * @param {string} urlPath エンドポイントの URL パス
@@ -123,6 +86,43 @@ function storage(urlPath, dir) {
         downloadURL,
       })
       return
+    }
+
+    next()
+  }
+}
+
+/**
+ * コメント投稿に伴って投稿の totalComments を増減させる。
+ *
+ * @return {Middleware}
+ */
+function totalComments() {
+  return async (req, res, next) => {
+    const lowdb = req.app.db
+
+    if (req.method === "POST" && req.path === "/comments") {
+      const comment = req.body
+
+      await lowdb
+        .get("posts")
+        .find({ id: comment.postId })
+        .update("totalComments", (v) => v + 1)
+        .write()
+    }
+
+    if (req.method === "DELETE" && req.path.startsWith("/comments/")) {
+      // /comments/:id -> "", "comments", ":id"
+      const [, , id] = req.path.split("/")
+      if (id) {
+        const comment = lowdb.get("comments").find({ id }).value()
+
+        await lowdb
+          .get("posts")
+          .find({ id: comment.postId })
+          .update("totalComments", (v) => v - 1)
+          .write()
+      }
     }
 
     next()
