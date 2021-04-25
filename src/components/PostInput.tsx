@@ -1,5 +1,6 @@
 import { css, cx } from "@emotion/css"
 import { useState } from "react"
+import { ENV_API_ENDPOINT } from "../env"
 import { usePostDraft } from "../hooks/usePostDraft"
 import { addPost } from "../hooks/usePosts"
 import { useUser } from "../hooks/useUser"
@@ -117,13 +118,26 @@ export function PostInput({
           onSubmit={async () => {
             setSubmitting(true)
 
-            // TODO モック実装を本物にする。
-            await mockProgress(setImgUploadProgress)
+            let downloadURL: string | null = null
+            if (draft.img?.file) {
+              // TODO モック実装を本物にする。
+              await mockProgress(setImgUploadProgress)
+
+              const resp = await fetch(`${ENV_API_ENDPOINT}/_storage`, {
+                method: "POST",
+                body: draft.img.file,
+              })
+              if (!resp.ok) {
+                return
+              }
+
+              downloadURL = (await resp.json()).downloadURL
+            }
 
             await addPost({
               author: uid,
               text: draft.text,
-              imgSrc: draft.img?.src ?? null,
+              imgSrc: downloadURL,
               postedAt: Date.now(),
               likes: [],
               totalComments: 0,
