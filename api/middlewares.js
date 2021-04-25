@@ -13,26 +13,11 @@ const path = require("path")
  * @typedef {(req: Request, res: Response, next: NextFunction) => void} Middleware
  */
 const middlewares = [
-  latency(1000, 100),
   totalComments(),
   storage("/_storage", path.resolve(process.cwd(), "_storage")),
 ]
 
 module.exports = middlewares
-
-/**
- * ランダムなレイテンシーを再現する。
- * min に近い値が出やすい。
- *
- * @param {number} max 遅延の最大値 (ms)
- * @param {number} min 遅延の最小値 (ms)
- * @return {Middleware}
- */
-function latency(max, min = 0) {
-  return (req, res, next) => {
-    setTimeout(next, Math.random() ** 2 * (max - min) + min)
-  }
-}
 
 /**
  * コメント投稿に伴って投稿の totalComments を増減させる。
