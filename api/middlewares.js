@@ -119,12 +119,18 @@ function storage(urlPath, dir) {
       }
 
       const filePath = path.join(dir, `${Date.now()}${extname}`)
-      await new Promise((resolve, reject) => {
-        req
-          .pipe(fs.createWriteStream(filePath))
-          .once("finish", resolve)
-          .once("error", reject)
-      })
+
+      try {
+        await new Promise((resolve, reject) => {
+          req
+            .pipe(fs.createWriteStream(filePath))
+            .once("finish", resolve)
+            .once("error", reject)
+        })
+      } catch (error) {
+        res.status(500).send()
+        return
+      }
 
       const origin = `${req.protocol}://${req.get("host")}`
       const downloadURL = `${origin}${urlPath}/${path.basename(filePath)}`
