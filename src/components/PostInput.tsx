@@ -1,10 +1,9 @@
 import { css, cx } from "@emotion/css"
 import { useState } from "react"
-import { ENV_API_ENDPOINT } from "../env"
 import { usePostDraft } from "../hooks/usePostDraft"
 import { addPost } from "../hooks/usePosts"
 import { useUser } from "../hooks/useUser"
-import { mockProgress } from "../util/mockProgress"
+import { uploadFile } from "../util/uploadFile"
 import { Avatar } from "./Avatar"
 import { DialogPostEdit } from "./DialogPostEdit"
 import { ModalBackdrop } from "./ModalBackdrop"
@@ -118,33 +117,38 @@ export function PostInput({
           onSubmit={async () => {
             setSubmitting(true)
 
-            let downloadURL: string | null = null
-            if (draft.img?.file) {
-              // TODO モック実装を本物にする。
-              await mockProgress(setImgUploadProgress)
+            try {
+              let downloadURL: string | null = null
+              if (draft.img?.file) {
+                const result = await uploadFile(
+                  draft.img.file,
+                  ({ bytesTransferred, totalBytes }) => {
+                    setImgUploadProgress((bytesTransferred / totalBytes) * 100)
+                  }
+                )
 
-              const resp = await fetch(`${ENV_API_ENDPOINT}/_storage`, {
-                method: "POST",
-                body: draft.img.file,
-              })
-              if (!resp.ok) {
-                return
+                downloadURL = result.downloadURL
               }
 
-              downloadURL = (await resp.json()).downloadURL
+              await addPost({
+                author: uid,
+                text: draft.text,
+                imgSrc: downloadURL,
+                postedAt: Date.now(),
+                likes: [],
+                totalComments: 0,
+              })
+
+              closeDialog()
+              resetAll()
+            } catch (error: unknown) {
+              console.error(error)
+
+              setImgUploadProgress(0)
+              setSubmitting(false)
+
+              alert("投稿できませんでした。")
             }
-
-            await addPost({
-              author: uid,
-              text: draft.text,
-              imgSrc: downloadURL,
-              postedAt: Date.now(),
-              likes: [],
-              totalComments: 0,
-            })
-
-            closeDialog()
-            resetAll()
           }}
         />
       </ModalBackdrop>
