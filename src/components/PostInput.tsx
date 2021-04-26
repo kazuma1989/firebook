@@ -120,13 +120,17 @@ export function PostInput({
             try {
               let downloadURL: string | null = null
               if (draft.img?.file) {
-                const result = await uploadFile(
-                  draft.img.file,
+                const uploadTask = uploadFile(draft.img.file)
+
+                const unsubscribe = uploadTask.onProgress(
                   ({ bytesTransferred, totalBytes }) => {
                     setImgUploadProgress((bytesTransferred / totalBytes) * 100)
                   }
                 )
 
+                const result = await uploadTask.send()
+
+                unsubscribe()
                 downloadURL = result.downloadURL
               }
 
