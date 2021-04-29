@@ -20,7 +20,7 @@ const middlewares = [
   storage("/_storage", path.resolve(__dirname, "_storage"), {
     ".png": "image/png",
     ".jpg": "image/jpg",
-    ".jpeg": "image/jpg",
+    ".jpeg": "image/jpeg",
     ".gif": "image/gif",
   }),
 ]
