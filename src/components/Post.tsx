@@ -1,7 +1,8 @@
 import { css, cx } from "@emotion/css"
 import { useRef, useState } from "react"
-import stubAuth from "../stub/auth.json"
-import stubUsers from "../stub/users.json"
+import { useAuthor } from "../hooks/useAuthor"
+import { updatePost } from "../hooks/usePosts"
+import { useUser } from "../hooks/useUser"
 import { Avatar } from "./Avatar"
 import { Button } from "./Button"
 import { ButtonCircle } from "./ButtonCircle"
@@ -15,7 +16,7 @@ import { RelativeTime } from "./RelativeTime"
  * 投稿一つ。
  */
 export function Post({
-  path: postPath,
+  id: postId,
   author: authorId,
   text,
   imgSrc,
@@ -27,7 +28,7 @@ export function Post({
   className,
   style,
 }: {
-  path: string
+  id: string
   author?: string
   text?: string
   imgSrc?: string
@@ -39,12 +40,10 @@ export function Post({
   className?: string
   style?: React.CSSProperties
 }) {
-  // TODO モック実装を本物にする。
-  const { uid } = stubAuth
+  const { uid } = useUser()
 
   const isMine = authorId === uid
-  // TODO モック実装を本物にする。
-  const author = stubUsers.find((u) => u.uid === authorId)
+  const author = useAuthor(authorId)
 
   const [menuVisible, setMenuVisible] = useState(false)
   const toggleMenu = () => {
@@ -229,7 +228,18 @@ export function Post({
       >
         <Button
           onClick={async () => {
-            // TODO モック実装を本物にする。
+            try {
+              await updatePost(postId, {
+                // いいねしていたらいいねを取り消し、していなかったらいいね追加。
+                likes: likes?.includes(uid)
+                  ? likes.filter((v) => v !== uid)
+                  : [...likes, uid],
+              })
+            } catch (e) {
+              console.error(e)
+
+              alert("いいねできませんでした。")
+            }
           }}
           className={cx(
             css`
@@ -278,7 +288,7 @@ export function Post({
       </div>
 
       <CommentArea
-        postPath={postPath}
+        postId={postId}
         totalComments={totalComments}
         className={css`
           margin: 8px 16px 0;
@@ -287,7 +297,7 @@ export function Post({
 
       <CommentInput
         ref={commentInput$}
-        postPath={postPath}
+        postId={postId}
         className={css`
           margin: 0 16px 8px;
         `}

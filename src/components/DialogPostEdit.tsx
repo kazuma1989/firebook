@@ -1,7 +1,6 @@
 import { css, cx } from "@emotion/css"
 import { useRef } from "react"
-import stubAuth from "../stub/auth.json"
-import stubUsers from "../stub/users.json"
+import { useUser } from "../hooks/useUser"
 import { AutoSizingTextarea } from "./AutoSizingTextarea"
 import { asNonInteractiveSpan } from "./Button"
 import { ButtonCircle } from "./ButtonCircle"
@@ -42,8 +41,7 @@ export function DialogPostEdit({
   headerChildren?: React.ReactNode
   submitButtonChildren?: React.ReactNode
 }) {
-  // TODO モック実装を本物にする。
-  const { displayName } = stubUsers.find((u) => u.uid === stubAuth.uid)!
+  const { displayName } = useUser()
 
   const valid = text.trim() !== "" || Boolean(imgSrc)
 

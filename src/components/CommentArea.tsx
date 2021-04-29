@@ -1,6 +1,6 @@
 import { css } from "@emotion/css"
 import { useState } from "react"
-import stubUsers from "../stub/users.json"
+import { removeComment, useComments } from "../hooks/useComments"
 import { Comment } from "./Comment"
 import { Dialog } from "./Dialog"
 import { ModalBackdrop } from "./ModalBackdrop"
@@ -9,23 +9,24 @@ import { ModalBackdrop } from "./ModalBackdrop"
  * 投稿へのコメント一覧を表示する領域。
  */
 export function CommentArea({
-  postPath,
+  postId,
   totalComments = 0,
   className,
   style,
 }: {
-  postPath?: string
+  postId: string
   totalComments?: number
   className?: string
   style?: React.CSSProperties
 }) {
   const [limit, setLimit] = useState(3)
-  // TODO モック実装を本物にする。
-  const [author, postId] = postPath?.split("/") ?? []
-  const post = stubUsers
-    .find((u) => u.uid === author)
-    ?.posts.find((p) => p.id === postId)
-  const comments = post?.comments.slice(-limit) ?? []
+  const nextPage = () => {
+    setLimit((v) => v + 3)
+  }
+
+  // 投稿時刻降順で取得したものの順序を反転することで、
+  // 最新のコメントを取得しつつ新しいものを下に表示するということが可能
+  const comments = [...useComments(postId, limit)].reverse()
 
   const [deletingCommentId, setDeletingCommentId] = useState("")
   const finishConfirmingDeleteComment = () => {
@@ -37,9 +38,7 @@ export function CommentArea({
       {comments.length < totalComments && (
         <button
           type="button"
-          onClick={() => {
-            setLimit((v) => v + 3)
-          }}
+          onClick={nextPage}
           className={css`
             width: 100%;
             margin-bottom: 4px;
@@ -84,7 +83,7 @@ export function CommentArea({
             onSubmit={async () => {
               finishConfirmingDeleteComment()
 
-              // TODO モック実装を本物にする。
+              await removeComment(deletingCommentId, postId)
             }}
           />
         </ModalBackdrop>

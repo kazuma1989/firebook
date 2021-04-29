@@ -1,7 +1,7 @@
 import { css, cx } from "@emotion/css"
 import { forwardRef, useState } from "react"
-import stubAuth from "../stub/auth.json"
-import stubUsers from "../stub/users.json"
+import { addComment } from "../hooks/useComments"
+import { useUser } from "../hooks/useUser"
 import { AutoSizingTextarea } from "./AutoSizingTextarea"
 import { Avatar } from "./Avatar"
 import { ButtonCircle } from "./ButtonCircle"
@@ -12,20 +12,17 @@ import { sendIcon } from "./icon"
  */
 export const CommentInput = forwardRef(function CommentInput(
   {
-    postPath,
+    postId,
     className,
     style,
   }: {
-    postPath?: string
+    postId: string
     className?: string
     style?: React.CSSProperties
   },
   ref: React.ForwardedRef<HTMLTextAreaElement>
 ) {
-  // TODO モック実装を本物にする。
-  const { displayName, photoURL } = stubUsers.find(
-    (u) => u.uid === stubAuth.uid
-  )!
+  const { uid, displayName, photoURL } = useUser()
 
   const [text, setText] = useState("")
   const valid = text.trim() !== ""
@@ -33,8 +30,12 @@ export const CommentInput = forwardRef(function CommentInput(
   const submit = async () => {
     setText("")
 
-    // TODO モック実装を本物にする。
-    console.log({ postPath })
+    await addComment({
+      postId,
+      author: uid,
+      text,
+      postedAt: Date.now(),
+    })
   }
 
   return (

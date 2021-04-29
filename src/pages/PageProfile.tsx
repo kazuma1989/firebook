@@ -9,16 +9,16 @@ import { ModalBackdrop } from "../components/ModalBackdrop"
 import { PostArea } from "../components/PostArea"
 import { PostInput } from "../components/PostInput"
 import { TransparentFileInput } from "../components/TransparentFileInput"
-import stubAuth from "../stub/auth.json"
-import stubUsers from "../stub/users.json"
-import { mockProgress } from "../util/mockProgress"
+import { useUser } from "../hooks/useUser"
+import { removeFile } from "../util/removeFile"
+import { updateProfile } from "../util/updateProfile"
+import { uploadFile } from "../util/uploadFile"
 
 /**
  * プロフィールページ。
  */
 export function PageProfile() {
-  // TODO モック実装を本物にする。
-  const { uid } = stubAuth
+  const { uid } = useUser()
 
   return (
     <div>
@@ -53,10 +53,7 @@ function ProfileArea({
   className?: string
   style?: React.CSSProperties
 }) {
-  // TODO モック実装を本物にする。
-  const { displayName, photoURL } = stubUsers.find(
-    (u) => u.uid === stubAuth.uid
-  )!
+  const { uid, displayName, photoURL } = useUser()
 
   const [img, _setImg] = useState<{
     src: string
@@ -197,10 +194,34 @@ function ProfileArea({
               onSubmit={async () => {
                 setUploadProgress(0)
 
-                // TODO モック実装を本物にする。
-                await mockProgress(setUploadProgress)
+                try {
+                  const uploadTask = uploadFile(img.file)
 
-                clearImg()
+                  const unsubscribe = uploadTask.onProgress(
+                    ({ bytesTransferred, totalBytes }) => {
+                      setUploadProgress((bytesTransferred / totalBytes) * 100)
+                    }
+                  )
+
+                  const result = await uploadTask.send()
+
+                  unsubscribe()
+                  const downloadURL = result.downloadURL
+
+                  await updateProfile(uid, {
+                    photoURL: downloadURL,
+                  })
+
+                  if (photoURL) {
+                    await removeFile(photoURL)
+                  }
+
+                  clearImg()
+                } catch (e) {
+                  console.error(e)
+
+                  alert("プロフィールを変更できませんでした。")
+                }
               }}
             />
           </ModalBackdrop>

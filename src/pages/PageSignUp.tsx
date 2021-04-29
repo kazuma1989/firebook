@@ -10,7 +10,7 @@ import { useMockAuth } from "../hooks/useMockAuth"
 /**
  * あらかじめ入力可能な値。
  */
-export type StatePageSignUp = {
+export interface StatePageSignUp {
   email?: string
   password?: string
 }
@@ -19,7 +19,6 @@ export type StatePageSignUp = {
  * サインアップページ。
  */
 export function PageSignUp() {
-  // TODO モック実装を本物にする。
   const auth = useMockAuth()
 
   const history = useHistory()
@@ -86,7 +85,6 @@ export function PageSignUp() {
             setErrorMessage("")
 
             try {
-              // TODO モック実装を本物にする。
               await auth.signUp(email, password, displayName)
 
               setSigningUp(false)

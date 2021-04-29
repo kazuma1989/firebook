@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-type DraftImg = {
+interface DraftImg {
   src: string
   file?: File
   uploadProgress?: number

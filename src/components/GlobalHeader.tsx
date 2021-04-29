@@ -2,8 +2,7 @@ import { css, cx } from "@emotion/css"
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { useMockAuth } from "../hooks/useMockAuth"
-import stubAuth from "../stub/auth.json"
-import stubUsers from "../stub/users.json"
+import { useUser } from "../hooks/useUser"
 import { Avatar } from "./Avatar"
 import { Button } from "./Button"
 import { ButtonCircle } from "./ButtonCircle"
@@ -20,11 +19,8 @@ export function GlobalHeader({
   className?: string
   style?: React.CSSProperties
 }) {
-  // TODO モック実装を本物にする。
   const auth = useMockAuth()
-  const { displayName, photoURL } = stubUsers.find(
-    (u) => u.uid === stubAuth.uid
-  )!
+  const { displayName, photoURL } = useUser()
 
   const [menuVisible, setMenuVisible] = useState(false)
   const toggleMenu = () => {
@@ -142,7 +138,6 @@ export function GlobalHeader({
               onClick={() => {
                 closeMenu()
 
-                // TODO モック実装を本物にする。
                 auth.signOut()
               }}
             >

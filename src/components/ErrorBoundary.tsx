@@ -1,9 +1,9 @@
 import React from "react"
 import { PageOops } from "../pages/PageOops"
 
-type Props = {}
+interface Props {}
 
-type State = {
+interface State {
   error?: Error
 }
 
