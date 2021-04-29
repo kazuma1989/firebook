@@ -18,7 +18,20 @@ interface Post {
  * targetUID の指定があるときはそのユーザーの投稿だけを、指定がないときは全部の投稿を表示する。
  */
 export function usePosts(targetUID: string | undefined, limit: number): Post[] {
-  const posts$ = useSWR<PostEntity[]>("/posts")
+  const posts$ = useSWR<PostEntity[]>(
+    "/posts",
+
+    async (path: string) => {
+      const resp = await fetch(`${ENV_API_ENDPOINT}${path}`)
+      if (!resp.ok) {
+        throw new Error(
+          `${resp.status} ${resp.statusText} ${await resp.text()}`
+        )
+      }
+
+      return await resp.json()
+    }
+  )
 
   const posts =
     (targetUID

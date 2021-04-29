@@ -16,7 +16,20 @@ export function useComments(
   postId: string | undefined,
   limit: number
 ): Comment[] {
-  const comments$ = useSWR<CommentEntity[]>(`/comments?postId=${postId}`)
+  const comments$ = useSWR<CommentEntity[]>(
+    `/comments?postId=${postId}`,
+
+    async (path: string) => {
+      const resp = await fetch(`${ENV_API_ENDPOINT}${path}`)
+      if (!resp.ok) {
+        throw new Error(
+          `${resp.status} ${resp.statusText} ${await resp.text()}`
+        )
+      }
+
+      return await resp.json()
+    }
+  )
 
   return comments$.data?.slice(-limit).reverse() ?? []
 }
