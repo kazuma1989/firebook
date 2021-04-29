@@ -9,19 +9,19 @@
     "start": "snowpack dev",
     "build": "snowpack build",
     "test": "echo no tests",
-    "server": "npx json-server ./mock-api/db.json --middlewares ./mock-api/middlewares.js --port 5000 --watch",
+    "server": "json-server ./mock-api/db.json --middlewares ./mock-api/middlewares.js --port 5000 --watch",
     "format": "prettier --write \"./{public,src}/**/*.{css,html,ts,tsx}\"",
     "lint": "eslint \"./src/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@emotion/css": "11.1.x",
     "body-scroll-lock": "3.1.x",
-    "focus-trap": "6.3.x",
+    "focus-trap": "6.4.x",
     "react": "17.0.x",
     "react-dom": "17.0.x",
     "react-router-dom": "5.2.x",
     "swr": "0.5.x",
-    "tabbable": "5.1.x"
+    "tabbable": "5.2.x"
   },
   "devDependencies": {
     "@snowpack/plugin-dotenv": "2.1.x",
@@ -30,12 +30,13 @@
     "@types/react": "17.0.x",
     "@types/react-dom": "17.0.x",
     "@types/react-router-dom": "5.1.x",
-    "@typescript-eslint/eslint-plugin": "4.20.x",
-    "@typescript-eslint/parser": "4.20.x",
-    "eslint": "7.23.x",
-    "eslint-config-prettier": "8.1.x",
+    "@typescript-eslint/eslint-plugin": "4.22.x",
+    "@typescript-eslint/parser": "4.22.x",
+    "eslint": "7.25.x",
+    "eslint-config-prettier": "8.3.x",
     "eslint-plugin-react": "7.23.x",
     "eslint-plugin-react-hooks": "4.2.x",
+    "json-server": "0.16.x",
     "prettier": "2.2.x",
     "snowpack": "3.0.x",
     "typescript": "4.2.x"
