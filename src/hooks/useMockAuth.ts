@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { InsecureAuthInfo, User } from "../entity-types"
+import { InsecureAuthInfoEntity, UserEntity } from "../entity-types"
 import { ENV_API_ENDPOINT } from "../env"
 
 /**
@@ -41,18 +41,28 @@ class AuthStateStorage {
   currentUser: CurrentUser | null = null
 
   /**
+   * 初期化済みか否か。
+   */
+  private initialized = false
+
+  /**
    * インスタンスを初期化する。
    */
   init(): void {
-    this.currentUser = this.load()
+    if (this.initialized) return
+
+    this.load()
+    this.initialized = true
   }
 
   /**
    * サインイン状態が変化したら通知を受け取る。
    */
   onAuthStateChanged(listener: AuthStateListener): () => void {
-    // 追加タイミングによっては通知を逃すかもしれないので、追加直後に一度通知する。
-    listener(this.currentUser)
+    if (this.initialized) {
+      // 追加タイミングによっては通知を逃すかもしれないので、追加直後に一度通知する。
+      listener(this.currentUser)
+    }
 
     this.listeners.push(listener)
 
@@ -78,7 +88,7 @@ class AuthStateStorage {
       insecurePlainPassword: password,
     })
 
-    const [authInfo]: InsecureAuthInfo[] = await fetch(
+    const [authInfo]: InsecureAuthInfoEntity[] = await fetch(
       `${ENV_API_ENDPOINT}/insecureAuthInfo?${search.toString()}`
     ).then((r) => r.json())
 
@@ -86,9 +96,7 @@ class AuthStateStorage {
       throw new Error("サインインに失敗しました。")
     }
 
-    this.save({
-      uid: authInfo.uid,
-    })
+    this.save(authInfo.uid)
   }
 
   /**
@@ -109,7 +117,7 @@ class AuthStateStorage {
     password: string,
     displayName: string
   ): Promise<void> {
-    const { id: uid }: User = await fetch(`${ENV_API_ENDPOINT}/users`, {
+    const { id: uid }: UserEntity = await fetch(`${ENV_API_ENDPOINT}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -135,10 +143,8 @@ class AuthStateStorage {
       throw new Error("サインアップに失敗しました。")
     }
 
-    const authInfo: InsecureAuthInfo = await resp.json()
-    this.save({
-      uid: authInfo.uid,
-    })
+    const authInfo: InsecureAuthInfoEntity = await resp.json()
+    this.save(authInfo.uid)
   }
 
   // #region private
@@ -147,39 +153,30 @@ class AuthStateStorage {
 
   private readonly listeners: AuthStateListener[] = []
 
-  private notify(): void {
+  private set(currentUser: CurrentUser | null): void {
+    this.currentUser = currentUser
+
     this.listeners.forEach((listener) => {
       listener(this.currentUser)
     })
   }
 
-  private load(): CurrentUser | null {
-    try {
-      return JSON.parse(
-        sessionStorage.getItem(AuthStateStorage.STORAGE_KEY) ?? "null"
-      )
-    } catch (error: unknown) {
-      return this.currentUser
-    }
+  private load(): void {
+    const uid = sessionStorage.getItem(AuthStateStorage.STORAGE_KEY)
+
+    this.set(uid ? { uid } : null)
   }
 
-  private save(currentUser: CurrentUser): void {
-    this.currentUser = currentUser
+  private save(uid: string): void {
+    this.set({ uid })
 
-    sessionStorage.setItem(
-      AuthStateStorage.STORAGE_KEY,
-      JSON.stringify(this.currentUser)
-    )
-
-    this.notify()
+    sessionStorage.setItem(AuthStateStorage.STORAGE_KEY, uid)
   }
 
   private clear(): void {
-    this.currentUser = null
+    this.set(null)
 
     sessionStorage.removeItem(AuthStateStorage.STORAGE_KEY)
-
-    this.notify()
   }
 
   // #endregion private

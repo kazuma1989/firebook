@@ -1,6 +1,7 @@
 import { css, cx } from "@emotion/css"
 import { useRef, useState } from "react"
 import { useAuthor } from "../hooks/useAuthor"
+import { updatePost } from "../hooks/usePosts"
 import { useUser } from "../hooks/useUser"
 import { Avatar } from "./Avatar"
 import { Button } from "./Button"
@@ -227,7 +228,18 @@ export function Post({
       >
         <Button
           onClick={async () => {
-            // TODO モック実装を本物にする。
+            try {
+              await updatePost(postId, {
+                // いいねしていたらいいねを取り消し、していなかったらいいね追加。
+                likes: likes?.includes(uid)
+                  ? likes.filter((v) => v !== uid)
+                  : [...likes, uid],
+              })
+            } catch (e) {
+              console.error(e)
+
+              alert("いいねできませんでした。")
+            }
           }}
           className={cx(
             css`

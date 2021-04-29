@@ -1,71 +1,82 @@
 import { useEffect, useState } from "react"
-import { User as UserEntity } from "../entity-types"
+import useSWR from "swr"
+import { UserEntity } from "../entity-types"
 import { ENV_API_ENDPOINT } from "../env"
 import { useMockAuth } from "./useMockAuth"
 import { User } from "./useUser"
 
 interface UserState {
-  user: User | null
   loading: boolean
+  user: User | null
 }
 
 /**
  * サインインしているユーザーのプロフィール情報をデータベースから取得する。
  */
 export function useUserState(): UserState {
-  const { uid, loading: uidLoading } = useUID()
+  const authState = useAuthState()
 
-  const [userState, setUserState] = useState<UserState>({
-    user: null,
-    loading: true,
-  })
+  const user$ = useSWR<UserEntity>(
+    !authState.loading && authState.uid ? `/users/${authState.uid}` : null,
 
-  useEffect(() => {
-    if (!uid) return
+    async (path: string) => {
+      const resp = await fetch(`${ENV_API_ENDPOINT}${path}`)
+      if (!resp.ok) {
+        throw new Error(
+          `${resp.status} ${resp.statusText} ${await resp.text()}`
+        )
+      }
 
-    // サインインできたらデータベースからプロフィールを取得する。
-    // エンティティが存在しない可能性もあるが、その場合も loading = false にして取得完了とみなす。
-    fetch(`${ENV_API_ENDPOINT}/users/${uid}`)
-      .then((r) => r.json())
-      .then((user: UserEntity) => {
-        setUserState({
-          user: {
-            ...user,
-            uid: user.id,
-          },
-          loading: false,
-        })
-      })
-  }, [uid])
-
-  useEffect(() => {
-    if (uidLoading) return
-
-    // サインアウトしたらプロフィール情報もクリアしておく。
-    if (!uid) {
-      setUserState({
-        user: null,
-        loading: false,
-      })
+      return await resp.json()
     }
-  }, [uid, uidLoading])
+  )
 
-  return userState
+  if (user$.error) {
+    return {
+      loading: false,
+      user: null,
+    }
+  }
+
+  if (user$.data) {
+    const { id, displayName, photoURL } = user$.data
+
+    return {
+      loading: false,
+      user: {
+        uid: id,
+        displayName,
+        photoURL: photoURL ?? undefined,
+      },
+    }
+  }
+
+  if (!authState.loading && !authState.uid) {
+    return {
+      loading: false,
+      user: null,
+    }
+  }
+
+  return {
+    loading: true,
+    user: null,
+  }
 }
 
 /**
  * サインイン状態を取得する。
  */
-function useUID(): UIDState {
+function useAuthState(): AuthState {
   const auth = useMockAuth()
 
-  const [uidState, setUIDState] = useState<UIDState>(
+  const [authState, setAuthState] = useState<AuthState>(
     // currentUser が初期化済みであれば、その値を初期値として使い、loading = false とする。
     // currentUser が null のときは、サインアウト状態か初期化待ちかわからないので、loading = true とし、onAuthStateChanged を待つ。
     auth.currentUser
       ? {
-          uid: auth.currentUser.uid,
           loading: false,
+          uid: auth.currentUser.uid,
         }
       : {
           loading: true,
@@ -74,19 +85,23 @@ function useUID(): UIDState {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      setUIDState({
-        uid: currentUser?.uid,
+      setAuthState({
         loading: false,
+        uid: currentUser?.uid,
       })
     })
 
     return unsubscribe
   }, [auth])
 
-  return uidState
+  return authState
 }
 
-interface UIDState {
-  uid?: string
-  loading: boolean
-}
+type AuthState =
+  | {
+      loading: true
+    }
+  | {
+      loading: false
+      uid?: string
+    }

@@ -19,7 +19,6 @@ export interface StatePageSignUp {
  * サインアップページ。
  */
 export function PageSignUp() {
-  // TODO モック実装を本物にする。
   const auth = useMockAuth()
 
   const history = useHistory()

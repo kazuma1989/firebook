@@ -9,6 +9,7 @@
     "start": "snowpack dev",
     "build": "snowpack build",
     "test": "echo no tests",
+    "server": "npx json-server api/db.json --port 5000 --middlewares api/middlewares.js --watch",
     "format": "prettier --write \"./{public,src}/**/*.{css,html,ts,tsx}\"",
     "lint": "eslint \"./src/**/*.{ts,tsx}\""
   },
@@ -19,6 +20,7 @@
     "react": "17.0.x",
     "react-dom": "17.0.x",
     "react-router-dom": "5.2.x",
+    "swr": "0.5.x",
     "tabbable": "5.1.x"
   },
   "devDependencies": {

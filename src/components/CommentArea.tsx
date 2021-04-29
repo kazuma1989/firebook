@@ -1,7 +1,6 @@
 import { css } from "@emotion/css"
-import { useEffect, useState } from "react"
-import { Comment as CommentEntity } from "../entity-types"
-import { ENV_API_ENDPOINT } from "../env"
+import { useState } from "react"
+import { removeComment, useComments } from "../hooks/useComments"
 import { Comment } from "./Comment"
 import { Dialog } from "./Dialog"
 import { ModalBackdrop } from "./ModalBackdrop"
@@ -15,23 +14,19 @@ export function CommentArea({
   className,
   style,
 }: {
-  postId?: string
+  postId: string
   totalComments?: number
   className?: string
   style?: React.CSSProperties
 }) {
   const [limit, setLimit] = useState(3)
+  const nextPage = () => {
+    setLimit((v) => v + 3)
+  }
 
-  const [_comments, setComments] = useState<CommentEntity[]>([])
-  useEffect(() => {
-    fetch(`${ENV_API_ENDPOINT}/comments?postId=${postId}`)
-      .then((r) => r.json())
-      .then((comments: CommentEntity[]) => {
-        setComments(comments)
-      })
-  }, [postId])
-
-  const comments = _comments.slice(-limit) ?? []
+  // 投稿時刻降順で取得したものの順序を反転することで、
+  // 最新のコメントを取得しつつ新しいものを下に表示するということが可能
+  const comments = [...useComments(postId, limit)].reverse()
 
   const [deletingCommentId, setDeletingCommentId] = useState("")
   const finishConfirmingDeleteComment = () => {
@@ -43,9 +38,7 @@ export function CommentArea({
       {comments.length < totalComments && (
         <button
           type="button"
-          onClick={() => {
-            setLimit((v) => v + 3)
-          }}
+          onClick={nextPage}
           className={css`
             width: 100%;
             margin-bottom: 4px;
@@ -90,7 +83,7 @@ export function CommentArea({
             onSubmit={async () => {
               finishConfirmingDeleteComment()
 
-              // TODO モック実装を本物にする。
+              await removeComment(deletingCommentId, postId)
             }}
           />
         </ModalBackdrop>

@@ -1,5 +1,6 @@
 import { css, cx } from "@emotion/css"
 import { forwardRef, useState } from "react"
+import { addComment } from "../hooks/useComments"
 import { useUser } from "../hooks/useUser"
 import { AutoSizingTextarea } from "./AutoSizingTextarea"
 import { Avatar } from "./Avatar"
@@ -15,13 +16,13 @@ export const CommentInput = forwardRef(function CommentInput(
     className,
     style,
   }: {
-    postId?: string
+    postId: string
     className?: string
     style?: React.CSSProperties
   },
   ref: React.ForwardedRef<HTMLTextAreaElement>
 ) {
-  const { displayName, photoURL } = useUser()
+  const { uid, displayName, photoURL } = useUser()
 
   const [text, setText] = useState("")
   const valid = text.trim() !== ""
@@ -29,8 +30,12 @@ export const CommentInput = forwardRef(function CommentInput(
   const submit = async () => {
     setText("")
 
-    // TODO モック実装を本物にする。
-    console.log({ postId })
+    await addComment({
+      postId,
+      author: uid,
+      text,
+      postedAt: Date.now(),
+    })
   }
 
   return (

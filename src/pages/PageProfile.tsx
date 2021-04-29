@@ -10,7 +10,9 @@ import { PostArea } from "../components/PostArea"
 import { PostInput } from "../components/PostInput"
 import { TransparentFileInput } from "../components/TransparentFileInput"
 import { useUser } from "../hooks/useUser"
-import { mockProgress } from "../util/mockProgress"
+import { removeFile } from "../util/removeFile"
+import { updateProfile } from "../util/updateProfile"
+import { uploadFile } from "../util/uploadFile"
 
 /**
  * プロフィールページ。
@@ -51,7 +53,7 @@ function ProfileArea({
   className?: string
   style?: React.CSSProperties
 }) {
-  const { displayName, photoURL } = useUser()
+  const { uid, displayName, photoURL } = useUser()
 
   const [img, _setImg] = useState<{
     src: string
@@ -192,10 +194,34 @@ function ProfileArea({
               onSubmit={async () => {
                 setUploadProgress(0)
 
-                // TODO モック実装を本物にする。
-                await mockProgress(setUploadProgress)
+                try {
+                  const uploadTask = uploadFile(img.file)
 
-                clearImg()
+                  const unsubscribe = uploadTask.onProgress(
+                    ({ bytesTransferred, totalBytes }) => {
+                      setUploadProgress((bytesTransferred / totalBytes) * 100)
+                    }
+                  )
+
+                  const result = await uploadTask.send()
+
+                  unsubscribe()
+                  const downloadURL = result.downloadURL
+
+                  await updateProfile(uid, {
+                    photoURL: downloadURL,
+                  })
+
+                  if (photoURL) {
+                    await removeFile(photoURL)
+                  }
+
+                  clearImg()
+                } catch (e) {
+                  console.error(e)
+
+                  alert("プロフィールを変更できませんでした。")
+                }
               }}
             />
           </ModalBackdrop>

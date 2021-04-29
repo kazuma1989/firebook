@@ -8,7 +8,7 @@ interface Entity {
 /**
  * 認証情報。
  */
-export interface InsecureAuthInfo extends Entity {
+export interface InsecureAuthInfoEntity extends Entity {
   email: string
   insecurePlainPassword: string
   uid: string
@@ -17,18 +17,18 @@ export interface InsecureAuthInfo extends Entity {
 /**
  * ユーザーのプロフィール。
  */
-export interface User extends Entity {
+export interface UserEntity extends Entity {
   displayName: string
-  photoURL?: string
+  photoURL: string | null
 }
 
 /**
  * 投稿のデータ。
  */
-export interface Post extends Entity {
+export interface PostEntity extends Entity {
   author: string
-  text?: string
-  imgSrc?: string
+  text: string | null
+  imgSrc: string | null
   postedAt: number
   likes: string[]
   totalComments: number
@@ -37,7 +37,7 @@ export interface Post extends Entity {
 /**
  * コメントのデータ。
  */
-export interface Comment extends Entity {
+export interface CommentEntity extends Entity {
   postId: string
   author: string
   text: string
