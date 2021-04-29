@@ -35,6 +35,7 @@ function storage(urlPath, dir) {
   }
 
   return async (req, res, next) => {
+    // ダウンロード
     if (req.method === "GET" && req.path.startsWith(`${urlPath}/`)) {
       // /url/:filename -> "", "url", ":filename"
       const [, , filename] = req.path.split("/")
@@ -56,6 +57,7 @@ function storage(urlPath, dir) {
       return
     }
 
+    // アップロード
     if (req.method === "POST" && req.path === urlPath) {
       const [extname] =
         Object.entries(mimeTypes).find(([, mimeType]) =>
@@ -82,9 +84,22 @@ function storage(urlPath, dir) {
 
       const origin = `${req.protocol}://${req.get("host")}`
       const downloadURL = `${origin}${urlPath}/${path.basename(filePath)}`
+
       res.status(201).json({
         downloadURL,
       })
+      return
+    }
+
+    // 削除
+    if (req.method === "DELETE" && req.path.startsWith(`${urlPath}/`)) {
+      // /url/:filename -> "", "url", ":filename"
+      const [, , filename] = req.path.split("/")
+      const filePath = path.join(dir, path.normalize(filename))
+
+      await fs.promises.unlink(filePath).catch(() => null)
+
+      res.status(204).send()
       return
     }
 
@@ -101,6 +116,7 @@ function totalComments() {
   return async (req, res, next) => {
     const lowdb = req.app.db
 
+    // 投稿時に増やす
     if (req.method === "POST" && req.path === "/comments") {
       const comment = req.body
 
@@ -111,6 +127,7 @@ function totalComments() {
         .write()
     }
 
+    // 削除時に減らす
     if (req.method === "DELETE" && req.path.startsWith("/comments/")) {
       // /comments/:id -> "", "comments", ":id"
       const [, , id] = req.path.split("/")
