@@ -24,7 +24,7 @@ export function PostArea({
 
   const [deletingState, setDeletingState] = useState<{
     postId: string
-    hasImg: boolean
+    imgSrc?: string
   } | null>(null)
   const stopDeleting = () => {
     setDeletingState(null)
@@ -71,7 +71,7 @@ export function PostArea({
               onDelete={() => {
                 setDeletingState({
                   postId,
-                  hasImg: Boolean(imgSrc),
+                  imgSrc,
                 })
               }}
               className={css`
@@ -92,7 +92,7 @@ export function PostArea({
             onSubmit={async () => {
               stopDeleting()
 
-              await removePost(deletingState.postId)
+              await removePost(deletingState.postId, deletingState.imgSrc)
             }}
           />
         </ModalBackdrop>
