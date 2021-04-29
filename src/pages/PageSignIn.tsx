@@ -12,7 +12,6 @@ import { StatePageSignUp } from "./PageSignUp"
  * サインインページ。
  */
 export function PageSignIn() {
-  // TODO モック実装を本物にする。
   const auth = useMockAuth()
 
   const [signingIn, setSigningIn] = useState(false)

@@ -19,7 +19,6 @@ export function GlobalHeader({
   className?: string
   style?: React.CSSProperties
 }) {
-  // TODO モック実装を本物にする。
   const auth = useMockAuth()
   const { displayName, photoURL } = useUser()
 
