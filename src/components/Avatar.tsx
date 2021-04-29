@@ -56,6 +56,9 @@ export function Avatar({
   )
 }
 
+/**
+ * デフォルトアバター。
+ */
 function DefaultAvatar({
   className,
   style,
