@@ -89,13 +89,7 @@ export async function updatePost(
 /**
  * 投稿を削除する。
  */
-export async function removePost(id: string, imgSrc?: string): Promise<void> {
-  if (imgSrc?.startsWith(ENV_API_ENDPOINT)) {
-    await fetch(imgSrc, {
-      method: "DELETE",
-    })
-  }
-
+export async function removePost(id: string): Promise<void> {
   const resp = await fetch(`${ENV_API_ENDPOINT}/posts/${id}`, {
     method: "DELETE",
   })

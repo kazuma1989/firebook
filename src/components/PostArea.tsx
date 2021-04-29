@@ -2,7 +2,8 @@ import { css } from "@emotion/css"
 import { useState } from "react"
 import { usePostDraft } from "../hooks/usePostDraft"
 import { removePost, updatePost, usePosts } from "../hooks/usePosts"
-import { mockProgress } from "../util/mockProgress"
+import { removeFile } from "../util/removeFile"
+import { uploadFile } from "../util/uploadFile"
 import { Dialog } from "./Dialog"
 import { DialogPostEdit } from "./DialogPostEdit"
 import { ModalBackdrop } from "./ModalBackdrop"
@@ -92,7 +93,11 @@ export function PostArea({
             onSubmit={async () => {
               stopDeleting()
 
-              await removePost(deletingState.postId, deletingState.imgSrc)
+              if (deletingState.imgSrc) {
+                await removeFile(deletingState.imgSrc)
+              }
+
+              await removePost(deletingState.postId)
             }}
           />
         </ModalBackdrop>
@@ -217,16 +222,124 @@ function EditModal({
         onSubmit={async () => {
           setSubmitting(true)
 
-          // TODO モック実装を本物にする。
-          await mockProgress(setImgUploadProgress)
+          try {
+            // 編集開始時と終了時を比べて、画像をどう変更したか分類する。
+            let imageUpdate:
+              | {
+                  type: "unchanged"
+                }
+              | {
+                  type: "added"
+                  file: File
+                }
+              | {
+                  type: "changed"
+                  file: File
+                  prevImgSrc: string
+                }
+              | {
+                  type: "removed"
+                  removedImgSrc: string
+                }
 
-          await updatePost(postId, {
-            text: draft.text,
-            imgSrc: draft.img?.src ?? null,
-          })
+            if (initialImgSrc) {
+              // 元から画像があったうえで改めてファイルを選んだときは「変更」。
+              if (draft.img?.file) {
+                imageUpdate = {
+                  type: "changed",
+                  file: draft.img.file,
+                  prevImgSrc: initialImgSrc,
+                }
+              }
+              // 元の画像と現状の画像 URL が同じときは「変更なし」。
+              else if (draft.img?.src === initialImgSrc) {
+                imageUpdate = {
+                  type: "unchanged",
+                }
+              }
+              // 元の画像があったのに前述のどちらでもない場合は「削除」。
+              else {
+                imageUpdate = {
+                  type: "removed",
+                  removedImgSrc: initialImgSrc,
+                }
+              }
+            } else {
+              // 元は画像がなかったが今はファイルを選んでいるときは「追加」。
+              if (draft.img?.file) {
+                imageUpdate = {
+                  type: "added",
+                  file: draft.img.file,
+                }
+              }
+              // 元から画像がなくて今回もファイルがないので「変更なし」。
+              else {
+                imageUpdate = {
+                  type: "unchanged",
+                }
+              }
+            }
 
-          resetAll()
-          onFinish?.()
+            switch (imageUpdate.type) {
+              // 画像を追加または変更したときは画像をアップロードする。
+              case "added":
+              case "changed": {
+                const uploadTask = uploadFile(imageUpdate.file)
+
+                const unsubscribe = uploadTask.onProgress(
+                  ({ bytesTransferred, totalBytes }) => {
+                    setImgUploadProgress((bytesTransferred / totalBytes) * 100)
+                  }
+                )
+
+                const result = await uploadTask.send()
+
+                unsubscribe()
+                const downloadURL = result.downloadURL
+
+                if (imageUpdate.type === "changed") {
+                  await removeFile(imageUpdate.prevImgSrc)
+                }
+
+                await updatePost(postId, {
+                  text: draft.text,
+                  imgSrc: downloadURL,
+                })
+
+                break
+              }
+
+              // 画像を削除する。
+              case "removed": {
+                await updatePost(postId, {
+                  text: draft.text,
+                  imgSrc: null,
+                })
+
+                await removeFile(imageUpdate.removedImgSrc)
+
+                break
+              }
+
+              // 画像を変えていないときは Storage に対しては何もしない。
+              case "unchanged": {
+                await updatePost(postId, {
+                  text: draft.text,
+                })
+
+                break
+              }
+            }
+
+            resetAll()
+            onFinish?.()
+          } catch (e) {
+            console.error(e)
+
+            setSubmitting(false)
+
+            alert("投稿できませんでした。")
+          }
         }}
       />
 
