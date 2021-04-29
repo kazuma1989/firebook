@@ -36,12 +36,19 @@ module.exports = middlewares
  * @return {Middleware}
  */
 function storage(urlPath, storageDir, mimeTypes) {
+  /**
+   * ディレクトリトラバーサルを防止したパスを返す。
+   * @param {string} filename
+   */
+  const safeFilePath = (filename) =>
+    path.join(storageDir, path.normalize(`/${filename}`))
+
   return async (req, res, next) => {
     // ダウンロード
     if (req.method === "GET" && req.path.startsWith(`${urlPath}/`)) {
       // /url/:filename -> "", "url", ":filename"
       const [, , filename] = req.path.split("/")
-      const filePath = path.join(storageDir, path.normalize(filename))
+      const filePath = safeFilePath(filename)
       const mimeType = mimeTypes[path.extname(filePath).toLowerCase()]
 
       res.setHeader("Content-Type", mimeType || "application/octet-stream")
@@ -70,7 +77,8 @@ function storage(urlPath, storageDir, mimeTypes) {
         return
       }
 
-      const filePath = path.join(storageDir, `${Date.now()}${extname}`)
+      const filename = `${Date.now()}${extname}`
+      const filePath = safeFilePath(filename)
 
       try {
         await new Promise((resolve, reject) => {
@@ -97,7 +105,7 @@ function storage(urlPath, storageDir, mimeTypes) {
     if (req.method === "DELETE" && req.path.startsWith(`${urlPath}/`)) {
       // /url/:filename -> "", "url", ":filename"
       const [, , filename] = req.path.split("/")
-      const filePath = path.join(storageDir, path.normalize(filename))
+      const filePath = safeFilePath(filename)
 
       await fs.promises.unlink(filePath).catch(() => null)
 
