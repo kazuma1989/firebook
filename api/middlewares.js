@@ -13,8 +13,16 @@ const path = require("path")
  * @typedef {(req: Request, res: Response, next: NextFunction) => void} Middleware
  */
 const middlewares = [
-  totalComments(),
-  storage("/_storage", path.resolve(process.cwd(), "_storage")),
+  // コメントの増減に伴って、投稿の `totalComments` フィールドの値も増減させる。
+  changeTotalCounts("comments", "postId", "posts", "totalComments"),
+
+  // `/_storage` に対してファイルをアップロードしたりダウンロードしたりできるようにする。
+  storage("/_storage", path.resolve(__dirname, "_storage"), {
+    ".png": "image/png",
+    ".jpg": "image/jpg",
+    ".jpeg": "image/jpg",
+    ".gif": "image/gif",
+  }),
 ]
 
 module.exports = middlewares
@@ -23,23 +31,17 @@ module.exports = middlewares
  * ファイルをアップロード／ダウンロードするエンドポイントを追加する。
  *
  * @param {string} urlPath エンドポイントの URL パス
- * @param {string} dir ファイルを保存／取得するディレクトリ
+ * @param {string} storageDir ファイルを保存／取得するディレクトリ
+ * @param {Record<string, string>} mimeTypes Content-Type とファイル拡張子の対応
  * @return {Middleware}
  */
-function storage(urlPath, dir) {
-  const mimeTypes = {
-    ".png": "image/png",
-    ".jpg": "image/jpg",
-    ".jpeg": "image/jpg",
-    ".gif": "image/gif",
-  }
-
+function storage(urlPath, storageDir, mimeTypes) {
   return async (req, res, next) => {
     // ダウンロード
     if (req.method === "GET" && req.path.startsWith(`${urlPath}/`)) {
       // /url/:filename -> "", "url", ":filename"
       const [, , filename] = req.path.split("/")
-      const filePath = path.join(dir, path.normalize(filename))
+      const filePath = path.join(storageDir, path.normalize(filename))
       const mimeType = mimeTypes[path.extname(filePath).toLowerCase()]
 
       res.setHeader("Content-Type", mimeType || "application/octet-stream")
@@ -68,7 +70,7 @@ function storage(urlPath, dir) {
         return
       }
 
-      const filePath = path.join(dir, `${Date.now()}${extname}`)
+      const filePath = path.join(storageDir, `${Date.now()}${extname}`)
 
       try {
         await new Promise((resolve, reject) => {
@@ -95,7 +97,7 @@ function storage(urlPath, dir) {
     if (req.method === "DELETE" && req.path.startsWith(`${urlPath}/`)) {
       // /url/:filename -> "", "url", ":filename"
       const [, , filename] = req.path.split("/")
-      const filePath = path.join(dir, path.normalize(filename))
+      const filePath = path.join(storageDir, path.normalize(filename))
 
       await fs.promises.unlink(filePath).catch(() => null)
 
@@ -108,36 +110,48 @@ function storage(urlPath, dir) {
 }
 
 /**
- * コメント投稿に伴って投稿の totalComments を増減させる。
+ * あるリソースの増減に伴って、関連リソースのフィールドの値を増減させる。
+ * たとえば、投稿に紐づくコメント数を同期させるときに使う。
  *
+ * @param {string} resourceToWatch 増減を監視するリソース名
+ * @param {string} relation 関連リソースの ID を保持するフィールド名
+ * @param {string} resourceToChange フィールドの値を同期させたいリソース名
+ * @param {string} fieldName カウントを保持するフィールド名
  * @return {Middleware}
  */
-function totalComments() {
+function changeTotalCounts(
+  resourceToWatch,
+  relation,
+  resourceToChange,
+  fieldName
+) {
+  const urlPath = `/${resourceToWatch}`
+
   return async (req, res, next) => {
     const lowdb = req.app.db
 
-    // 投稿時に増やす
-    if (req.method === "POST" && req.path === "/comments") {
-      const comment = req.body
+    // リソース追加時に増やす
+    if (req.method === "POST" && req.path === urlPath) {
+      const resource = req.body
 
       await lowdb
-        .get("posts")
-        .find({ id: comment.postId })
-        .update("totalComments", (v) => v + 1)
+        .get(resourceToChange)
+        .find({ id: resource[relation] })
+        .update(fieldName, (v) => v + 1)
         .write()
     }
 
-    // 削除時に減らす
-    if (req.method === "DELETE" && req.path.startsWith("/comments/")) {
-      // /comments/:id -> "", "comments", ":id"
+    // リソース削除時に減らす
+    if (req.method === "DELETE" && req.path.startsWith(`${urlPath}/`)) {
+      // /url/:id -> "", "url", ":id"
       const [, , id] = req.path.split("/")
       if (id) {
-        const comment = lowdb.get("comments").find({ id }).value()
+        const resource = lowdb.get(resourceToWatch).find({ id }).value()
 
         await lowdb
-          .get("posts")
-          .find({ id: comment.postId })
-          .update("totalComments", (v) => v - 1)
+          .get(resourceToChange)
+          .find({ id: resource[relation] })
+          .update(fieldName, (v) => v - 1)
           .write()
       }
     }
