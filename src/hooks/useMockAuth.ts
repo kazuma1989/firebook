@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import { InsecureAuthInfoEntity, UserEntity } from "../entity-types"
 import { ENV_API_ENDPOINT } from "../env"
 
@@ -9,11 +8,7 @@ import { ENV_API_ENDPOINT } from "../env"
  * カスタムイベントによって session storage の変更を検知している。
  */
 export function useMockAuth(): AuthStateStorage {
-  useEffect(() => {
-    globalAuthStateStorage.init()
-  }, [])
-
-  return globalAuthStateStorage
+  return AuthStateStorage.getInstance()
 }
 
 /**
@@ -45,10 +40,25 @@ class AuthStateStorage {
    */
   private initialized = false
 
+  private constructor() {}
+
+  private static instance?: AuthStateStorage
+
+  static getInstance(): AuthStateStorage {
+    if (!AuthStateStorage.instance) {
+      const instance = new AuthStateStorage()
+      instance.init()
+
+      AuthStateStorage.instance = instance
+    }
+
+    return AuthStateStorage.instance
+  }
+
   /**
    * インスタンスを初期化する。
    */
-  init(): void {
+  private init(): void {
     if (this.initialized) return
 
     this.load()
@@ -181,5 +191,3 @@ class AuthStateStorage {
 
   // #endregion private
 }
-
-const globalAuthStateStorage = new AuthStateStorage()
