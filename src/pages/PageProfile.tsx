@@ -10,8 +10,8 @@ import { PostArea } from "../components/PostArea"
 import { PostInput } from "../components/PostInput"
 import { TransparentFileInput } from "../components/TransparentFileInput"
 import { useCurrentUser } from "../hooks/useCurrentUser"
+import { updateUser } from "../hooks/useUser"
 import { removeFile } from "../util/removeFile"
-import { updateProfile } from "../util/updateProfile"
 import { uploadFile } from "../util/uploadFile"
 
 /**
@@ -210,7 +210,7 @@ function ProfileArea({
                   unsubscribe()
                   const downloadURL = result.downloadURL
 
-                  await updateProfile(uid, {
+                  await updateUser(uid, {
                     photoURL: downloadURL,
                   })
 

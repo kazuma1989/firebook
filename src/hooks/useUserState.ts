@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react"
-import useSWR from "swr"
-import { UserEntity } from "../entity-types"
-import { ENV_API_ENDPOINT } from "../env"
 import { CurrentUser } from "./useCurrentUser"
 import { useMockAuth } from "./useMockAuth"
+import { useUser } from "./useUser"
 
 interface UserState {
   loading: boolean
@@ -16,38 +14,14 @@ interface UserState {
 export function useUserState(): UserState {
   const authState = useAuthState()
 
-  const user$ = useSWR<UserEntity>(
-    !authState.loading && authState.uid ? `/users/${authState.uid}` : null,
-
-    async (path: string) => {
-      const resp = await fetch(`${ENV_API_ENDPOINT}${path}`)
-      if (!resp.ok) {
-        throw new Error(
-          `${resp.status} ${resp.statusText} ${await resp.text()}`
-        )
-      }
-
-      return await resp.json()
-    }
+  const user = useUser(
+    !authState.loading && authState.uid ? authState.uid : null
   )
 
-  if (user$.error) {
+  if (user) {
     return {
       loading: false,
-      currentUser: null,
-    }
-  }
-
-  if (user$.data) {
-    const { id, displayName, photoURL } = user$.data
-
-    return {
-      loading: false,
-      currentUser: {
-        uid: id,
-        displayName,
-        photoURL: photoURL ?? undefined,
-      },
+      currentUser: user,
     }
   }
 
