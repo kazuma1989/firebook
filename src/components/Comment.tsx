@@ -1,7 +1,7 @@
 import { css, cx } from "@emotion/css"
 import { useState } from "react"
 import { useAuthor } from "../hooks/useAuthor"
-import { useUser } from "../hooks/useUser"
+import { useCurrentUser } from "../hooks/useCurrentUser"
 import { Avatar } from "./Avatar"
 import { ButtonCircle } from "./ButtonCircle"
 import { menuIcon } from "./icon"
@@ -26,7 +26,7 @@ export function Comment({
   className?: string
   style?: React.CSSProperties
 }) {
-  const { uid } = useUser()
+  const { uid } = useCurrentUser()
 
   const isMine = authorId === uid
   const author = useAuthor(authorId)

@@ -9,7 +9,7 @@ import { ModalBackdrop } from "../components/ModalBackdrop"
 import { PostArea } from "../components/PostArea"
 import { PostInput } from "../components/PostInput"
 import { TransparentFileInput } from "../components/TransparentFileInput"
-import { useUser } from "../hooks/useUser"
+import { useCurrentUser } from "../hooks/useCurrentUser"
 import { removeFile } from "../util/removeFile"
 import { updateProfile } from "../util/updateProfile"
 import { uploadFile } from "../util/uploadFile"
@@ -18,7 +18,7 @@ import { uploadFile } from "../util/uploadFile"
  * プロフィールページ。
  */
 export function PageProfile() {
-  const { uid } = useUser()
+  const { uid } = useCurrentUser()
 
   return (
     <div>
@@ -53,7 +53,7 @@ function ProfileArea({
   className?: string
   style?: React.CSSProperties
 }) {
-  const { uid, displayName, photoURL } = useUser()
+  const { uid, displayName, photoURL } = useCurrentUser()
 
   const [img, _setImg] = useState<{
     src: string

@@ -1,7 +1,7 @@
 import { Route, Switch } from "react-router-dom"
 import { GlobalHeader } from "./components/GlobalHeader"
 import { GlobalLayout } from "./components/GlobalLayout"
-import { UserProvider } from "./hooks/useUser"
+import { CurrentUserProvider } from "./hooks/useCurrentUser"
 import { useUserState } from "./hooks/useUserState"
 import { PageHome } from "./pages/PageHome"
 import { PageLoading } from "./pages/PageLoading"
@@ -17,14 +17,14 @@ import { PageSignUp } from "./pages/PageSignUp"
  * - react-router-dom の BrowserRouter.
  */
 export function App() {
-  const { user, loading } = useUserState()
+  const { currentUser, loading } = useUserState()
 
   if (loading) {
     return <PageLoading />
   }
 
-  // user がないとき＝未サインイン状態。
-  if (!user) {
+  // currentUser がないとき＝未サインイン状態。
+  if (!currentUser) {
     return (
       <Switch>
         <Route exact path="/sign-up">
@@ -38,10 +38,10 @@ export function App() {
     )
   }
 
-  // user があるとき＝サインイン済み状態。
-  // コンテクストから user にアクセスできるようにする。
+  // currentUser があるとき＝サインイン済み状態。
+  // コンテクストから currentUser にアクセスできるようにする。
   return (
-    <UserProvider value={user}>
+    <CurrentUserProvider value={currentUser}>
       <GlobalLayout>
         <GlobalLayout.Header>
           <GlobalHeader />
@@ -63,6 +63,6 @@ export function App() {
           </Switch>
         </GlobalLayout.Body>
       </GlobalLayout>
-    </UserProvider>
+    </CurrentUserProvider>
   )
 }

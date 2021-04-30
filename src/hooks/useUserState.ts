@@ -2,12 +2,12 @@ import { useEffect, useState } from "react"
 import useSWR from "swr"
 import { UserEntity } from "../entity-types"
 import { ENV_API_ENDPOINT } from "../env"
+import { CurrentUser } from "./useCurrentUser"
 import { useMockAuth } from "./useMockAuth"
-import { User } from "./useUser"
 
 interface UserState {
   loading: boolean
-  user: User | null
+  currentUser: CurrentUser | null
 }
 
 /**
@@ -34,7 +34,7 @@ export function useUserState(): UserState {
   if (user$.error) {
     return {
       loading: false,
-      user: null,
+      currentUser: null,
     }
   }
 
@@ -43,7 +43,7 @@ export function useUserState(): UserState {
 
     return {
       loading: false,
-      user: {
+      currentUser: {
         uid: id,
         displayName,
         photoURL: photoURL ?? undefined,
@@ -54,13 +54,13 @@ export function useUserState(): UserState {
   if (!authState.loading && !authState.uid) {
     return {
       loading: false,
-      user: null,
+      currentUser: null,
     }
   }
 
   return {
     loading: true,
-    user: null,
+    currentUser: null,
   }
 }
 
