@@ -179,6 +179,7 @@ export function Post({
           `}
         >
           <img
+            alt="投稿に添付された写真"
             src={imgSrc}
             className={css`
               display: block;

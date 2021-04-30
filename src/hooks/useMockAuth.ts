@@ -42,16 +42,16 @@ class AuthStateStorage {
   /**
    * ストレージ。
    */
-  private readonly storage = new Storage(
-    "firebook.currentUserUID",
-    globalThis.sessionStorage
-  )
+  private readonly storage: Storage
 
   /**
    * コンストラクター。
    */
   private constructor() {
-    if (this.initialized) return
+    this.storage = new Storage(
+      "firebook.currentUserUID",
+      globalThis.sessionStorage
+    )
 
     const uid = this.storage.load()
     if (uid) {

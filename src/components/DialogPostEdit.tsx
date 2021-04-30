@@ -110,6 +110,7 @@ export function DialogPostEdit({
             `}
           >
             <img
+              alt="投稿に添付する写真"
               src={imgSrc}
               className={css`
                 display: block;
