@@ -58,7 +58,7 @@ function ProfileArea({
   const [img, _setImg] = useState<{
     src: string
     file: File
-    uploadProgress?: number
+    uploadProgress: number | undefined
   } | null>(null)
 
   const setImgFile = (file: File | null) => {
@@ -66,6 +66,7 @@ function ProfileArea({
       _setImg({
         src: URL.createObjectURL(file),
         file,
+        uploadProgress: undefined,
       })
     } else {
       _setImg(null)
@@ -80,8 +81,9 @@ function ProfileArea({
     setImgFile(null)
   }
 
-  const setUploadProgress = (progress: number) => {
+  const setUploadProgress = (progress: number | undefined) => {
     _setImg((img) => {
+      // アップロード中でないか進捗が同じときは何もしない。
       if (!img || img.uploadProgress === progress) {
         return img
       }
@@ -217,8 +219,10 @@ function ProfileArea({
                   }
 
                   clearImg()
-                } catch (e) {
-                  console.error(e)
+                } catch (error: unknown) {
+                  console.error(error)
+
+                  setUploadProgress(undefined)
 
                   alert("プロフィールを変更できませんでした。")
                 }
