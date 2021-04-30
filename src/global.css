@@ -11,6 +11,7 @@ body {
 }
 
 progress {
+  /* Safari でスタイルを制御できるように */
   background-repeat: initial;
 }
 
@@ -20,8 +21,13 @@ a:any-link {
 
 /* ress.css で無効になったアウトラインを復活させる */
 a:active,
-a:hover {
-  outline-width: revert;
+a:hover,
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: solid medium var(--color-primary-50);
 }
 
 /* https://stackoverflow.com/a/23860302/8662861 */

@@ -13,11 +13,11 @@ const path = require("path")
  * @typedef {(req: Request, res: Response, next: NextFunction) => void} Middleware
  */
 const middlewares = [
-  // コメントの増減に伴って、投稿の `totalComments` フィールドの値も増減させる。
-  changeTotalCounts("comments", "postId", "posts", "totalComments"),
-
   // `/_storage` に対して画像をアップロードしたりダウンロードしたりできるようにする。
   imageStorage("/_storage", path.resolve(__dirname, "_storage")),
+
+  // コメントの増減に伴って、投稿の `totalComments` フィールドの値も増減させる。
+  changeTotalCounts("comments", "postId", "posts", "totalComments"),
 ]
 
 module.exports = middlewares
