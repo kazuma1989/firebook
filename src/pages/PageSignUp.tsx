@@ -90,8 +90,8 @@ export function PageSignUp() {
               setSigningUp(false)
 
               navigateToHome()
-            } catch (e) {
-              console.error(e)
+            } catch (error: unknown) {
+              console.error(error)
 
               setSigningUp(false)
               setErrorMessage("失敗しました。")

@@ -1,40 +1,34 @@
-import { useEffect } from "react"
 import { InsecureAuthInfoEntity, UserEntity } from "../entity-types"
 import { ENV_API_ENDPOINT } from "../env"
 
 /**
  * サインイン機能をモックする。
  * Session storage にサインイン状態を記録するので、ブラウザーを開いている間は持続する。
- *
- * カスタムイベントによって session storage の変更を検知している。
  */
 export function useMockAuth(): AuthStateStorage {
-  useEffect(() => {
-    globalAuthStateStorage.init()
-  }, [])
-
-  return globalAuthStateStorage
+  return AuthStateStorage.getInstance()
 }
 
 /**
- * サインイン中のユーザーの情報。
- */
-interface CurrentUser {
-  uid: string
-}
-
-/**
- * サインイン状態が変化したら通知を受け取るコールバック。
- */
-interface AuthStateListener {
-  (currentUser: CurrentUser | null): void
-}
-
-/**
- * サインイン状態をモックするための、session storage のラッパー。
- * カスタムイベントを発行して変更を検知できるようになっている。
+ * サインイン状態を保持するシングルトンなクラス。
  */
 class AuthStateStorage {
+  /**
+   * シングルトンインスタンス。
+   */
+  private static instance?: AuthStateStorage
+
+  /**
+   * シングルトンインスタンスを取得する。
+   */
+  static getInstance(): AuthStateStorage {
+    if (!AuthStateStorage.instance) {
+      AuthStateStorage.instance = new AuthStateStorage()
+    }
+
+    return AuthStateStorage.instance
+  }
+
   /**
    * サインイン中のユーザーの情報。
    */
@@ -46,12 +40,24 @@ class AuthStateStorage {
   private initialized = false
 
   /**
-   * インスタンスを初期化する。
+   * ストレージ。
    */
-  init(): void {
+  private readonly storage = new Storage(
+    "firebook.currentUserUID",
+    globalThis.sessionStorage
+  )
+
+  /**
+   * コンストラクター。
+   */
+  private constructor() {
     if (this.initialized) return
 
-    this.load()
+    const uid = this.storage.load()
+    if (uid) {
+      this.currentUser = { uid }
+    }
+
     this.initialized = true
   }
 
@@ -64,16 +70,9 @@ class AuthStateStorage {
       listener(this.currentUser)
     }
 
-    this.listeners.push(listener)
-
-    const unsubscribe = () => {
-      const index = this.listeners.lastIndexOf(listener)
-      if (index === -1) return
-
-      this.listeners.splice(index, 1)
-    }
-
-    return unsubscribe
+    return this.storage.subscribe(() => {
+      listener(this.currentUser)
+    })
   }
 
   /**
@@ -96,14 +95,16 @@ class AuthStateStorage {
       throw new Error("サインインに失敗しました。")
     }
 
-    this.save(authInfo.uid)
+    this.currentUser = authInfo
+    this.storage.save(authInfo.uid)
   }
 
   /**
    * サインアウト（ログアウト）する。
    */
   async signOut(): Promise<void> {
-    this.clear()
+    this.currentUser = null
+    this.storage.clear()
   }
 
   /**
@@ -144,42 +145,76 @@ class AuthStateStorage {
     }
 
     const authInfo: InsecureAuthInfoEntity = await resp.json()
-    this.save(authInfo.uid)
+
+    this.currentUser = authInfo
+    this.storage.save(authInfo.uid)
   }
-
-  // #region private
-
-  private static readonly STORAGE_KEY = "firebook.authState"
-
-  private readonly listeners: AuthStateListener[] = []
-
-  private set(currentUser: CurrentUser | null): void {
-    this.currentUser = currentUser
-
-    this.listeners.forEach((listener) => {
-      listener(this.currentUser)
-    })
-  }
-
-  private load(): void {
-    const uid = sessionStorage.getItem(AuthStateStorage.STORAGE_KEY)
-
-    this.set(uid ? { uid } : null)
-  }
-
-  private save(uid: string): void {
-    this.set({ uid })
-
-    sessionStorage.setItem(AuthStateStorage.STORAGE_KEY, uid)
-  }
-
-  private clear(): void {
-    this.set(null)
-
-    sessionStorage.removeItem(AuthStateStorage.STORAGE_KEY)
-  }
-
-  // #endregion private
 }
 
-const globalAuthStateStorage = new AuthStateStorage()
+/**
+ * サインイン中のユーザーの情報。
+ */
+interface CurrentUser {
+  uid: string
+}
+
+/**
+ * サインイン状態が変化したら通知を受け取るコールバック。
+ */
+interface AuthStateListener {
+  (currentUser: CurrentUser | null): void
+}
+
+/**
+ * 変更を通知するストレージラッパー。
+ */
+class Storage {
+  private readonly listeners: StorageListener[] = []
+
+  constructor(
+    private readonly key: string,
+    private readonly storage: globalThis.Storage
+  ) {}
+
+  load(): string | null {
+    return this.storage.getItem(this.key)
+  }
+
+  save(value: string): void {
+    this.storage.setItem(this.key, value)
+
+    this.notify()
+  }
+
+  clear(): void {
+    this.storage.removeItem(this.key)
+
+    this.notify()
+  }
+
+  subscribe(listener: StorageListener): () => void {
+    this.listeners.push(listener)
+
+    const unsubscribe = () => {
+      const index = this.listeners.lastIndexOf(listener)
+      if (index === -1) return
+
+      this.listeners.splice(index, 1)
+    }
+
+    return unsubscribe
+  }
+
+  private notify() {
+    this.listeners.forEach((listener) => {
+      listener()
+    })
+  }
+}
+
+/**
+ * 通知を受け取るコールバック。
+ */
+interface StorageListener {
+  (): void
+}

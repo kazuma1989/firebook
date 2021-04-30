@@ -2,8 +2,8 @@ import { useState } from "react"
 
 interface DraftImg {
   src: string
-  file?: File
-  uploadProgress?: number
+  file: File | undefined
+  uploadProgress: number | undefined
 }
 
 /**
@@ -19,12 +19,17 @@ export function usePostDraft(initialText: string = "", initialImgSrc?: string) {
     setText(initialText)
   }
 
-  const [img, _setImg] = useState<DraftImg | null>(
-    initialImgSrc ? { src: initialImgSrc } : null
-  )
+  const initialImg: DraftImg | null = initialImgSrc
+    ? {
+        src: initialImgSrc,
+        file: undefined,
+        uploadProgress: undefined,
+      }
+    : null
 
+  const [img, _setImg] = useState(initialImg)
   const resetImg = () => {
-    _setImg(initialImgSrc ? { src: initialImgSrc } : null)
+    _setImg(initialImg)
 
     if (img?.src) {
       URL.revokeObjectURL(img.src)
@@ -36,6 +41,7 @@ export function usePostDraft(initialText: string = "", initialImgSrc?: string) {
       _setImg({
         src: URL.createObjectURL(file),
         file,
+        uploadProgress: undefined,
       })
     } else {
       _setImg(null)
@@ -46,14 +52,15 @@ export function usePostDraft(initialText: string = "", initialImgSrc?: string) {
     }
   }
 
-  const setImgUploadProgress = (progress: number) => {
-    _setImg((image) => {
-      if (!image || image.uploadProgress === progress) {
-        return image
+  const setImgUploadProgress = (progress: number | undefined) => {
+    _setImg((img) => {
+      // アップロード中でないか進捗が同じときは何もしない。
+      if (!img || img.uploadProgress === progress) {
+        return img
       }
 
       return {
-        ...image,
+        ...img,
         uploadProgress: progress,
       }
     })

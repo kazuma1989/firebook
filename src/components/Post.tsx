@@ -1,8 +1,8 @@
 import { css, cx } from "@emotion/css"
 import { useRef, useState } from "react"
 import { useAuthor } from "../hooks/useAuthor"
+import { useCurrentUser } from "../hooks/useCurrentUser"
 import { updatePost } from "../hooks/usePosts"
-import { useUser } from "../hooks/useUser"
 import { Avatar } from "./Avatar"
 import { Button } from "./Button"
 import { ButtonCircle } from "./ButtonCircle"
@@ -40,7 +40,7 @@ export function Post({
   className?: string
   style?: React.CSSProperties
 }) {
-  const { uid } = useUser()
+  const { uid } = useCurrentUser()
 
   const isMine = authorId === uid
   const author = useAuthor(authorId)
@@ -235,8 +235,8 @@ export function Post({
                   ? likes.filter((v) => v !== uid)
                   : [...likes, uid],
               })
-            } catch (e) {
-              console.error(e)
+            } catch (error: unknown) {
+              console.error(error)
 
               alert("いいねできませんでした。")
             }

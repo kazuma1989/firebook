@@ -9,16 +9,16 @@ import { ModalBackdrop } from "../components/ModalBackdrop"
 import { PostArea } from "../components/PostArea"
 import { PostInput } from "../components/PostInput"
 import { TransparentFileInput } from "../components/TransparentFileInput"
-import { useUser } from "../hooks/useUser"
+import { useCurrentUser } from "../hooks/useCurrentUser"
+import { updateUser } from "../hooks/useUser"
 import { removeFile } from "../util/removeFile"
-import { updateProfile } from "../util/updateProfile"
 import { uploadFile } from "../util/uploadFile"
 
 /**
  * プロフィールページ。
  */
 export function PageProfile() {
-  const { uid } = useUser()
+  const { uid } = useCurrentUser()
 
   return (
     <div>
@@ -53,12 +53,12 @@ function ProfileArea({
   className?: string
   style?: React.CSSProperties
 }) {
-  const { uid, displayName, photoURL } = useUser()
+  const { uid, displayName, photoURL } = useCurrentUser()
 
   const [img, _setImg] = useState<{
     src: string
     file: File
-    uploadProgress?: number
+    uploadProgress: number | undefined
   } | null>(null)
 
   const setImgFile = (file: File | null) => {
@@ -66,6 +66,7 @@ function ProfileArea({
       _setImg({
         src: URL.createObjectURL(file),
         file,
+        uploadProgress: undefined,
       })
     } else {
       _setImg(null)
@@ -80,8 +81,9 @@ function ProfileArea({
     setImgFile(null)
   }
 
-  const setUploadProgress = (progress: number) => {
+  const setUploadProgress = (progress: number | undefined) => {
     _setImg((img) => {
+      // アップロード中でないか進捗が同じときは何もしない。
       if (!img || img.uploadProgress === progress) {
         return img
       }
@@ -208,7 +210,7 @@ function ProfileArea({
                   unsubscribe()
                   const downloadURL = result.downloadURL
 
-                  await updateProfile(uid, {
+                  await updateUser(uid, {
                     photoURL: downloadURL,
                   })
 
@@ -217,8 +219,10 @@ function ProfileArea({
                   }
 
                   clearImg()
-                } catch (e) {
-                  console.error(e)
+                } catch (error: unknown) {
+                  console.error(error)
+
+                  setUploadProgress(undefined)
 
                   alert("プロフィールを変更できませんでした。")
                 }

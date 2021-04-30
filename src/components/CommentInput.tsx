@@ -1,7 +1,7 @@
 import { css, cx } from "@emotion/css"
 import { forwardRef, useState } from "react"
 import { addComment } from "../hooks/useComments"
-import { useUser } from "../hooks/useUser"
+import { useCurrentUser } from "../hooks/useCurrentUser"
 import { AutoSizingTextarea } from "./AutoSizingTextarea"
 import { Avatar } from "./Avatar"
 import { ButtonCircle } from "./ButtonCircle"
@@ -22,7 +22,7 @@ export const CommentInput = forwardRef(function CommentInput(
   },
   ref: React.ForwardedRef<HTMLTextAreaElement>
 ) {
-  const { uid, displayName, photoURL } = useUser()
+  const { uid, displayName, photoURL } = useCurrentUser()
 
   const [text, setText] = useState("")
   const valid = text.trim() !== ""

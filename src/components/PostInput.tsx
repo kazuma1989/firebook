@@ -1,8 +1,8 @@
 import { css, cx } from "@emotion/css"
 import { useState } from "react"
+import { useCurrentUser } from "../hooks/useCurrentUser"
 import { usePostDraft } from "../hooks/usePostDraft"
 import { addPost } from "../hooks/usePosts"
-import { useUser } from "../hooks/useUser"
 import { uploadFile } from "../util/uploadFile"
 import { Avatar } from "./Avatar"
 import { DialogPostEdit } from "./DialogPostEdit"
@@ -19,7 +19,7 @@ export function PostInput({
   className?: string
   style?: React.CSSProperties
 }) {
-  const { uid, displayName, photoURL } = useUser()
+  const { uid, displayName, photoURL } = useCurrentUser()
 
   const [
     draft,
@@ -148,7 +148,7 @@ export function PostInput({
             } catch (error: unknown) {
               console.error(error)
 
-              setImgUploadProgress(0)
+              setImgUploadProgress(undefined)
               setSubmitting(false)
 
               alert("投稿できませんでした。")

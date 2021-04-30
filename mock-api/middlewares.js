@@ -16,35 +16,38 @@ const middlewares = [
   // コメントの増減に伴って、投稿の `totalComments` フィールドの値も増減させる。
   changeTotalCounts("comments", "postId", "posts", "totalComments"),
 
-  // `/_storage` に対してファイルをアップロードしたりダウンロードしたりできるようにする。
-  storage("/_storage", path.resolve(__dirname, "_storage"), {
-    ".png": "image/png",
-    ".jpg": "image/jpg",
-    ".jpeg": "image/jpg",
-    ".gif": "image/gif",
-  }),
+  // `/_storage` に対して画像をアップロードしたりダウンロードしたりできるようにする。
+  imageStorage("/_storage", path.resolve(__dirname, "_storage")),
 ]
 
 module.exports = middlewares
 
 /**
- * ファイルをアップロード／ダウンロードするエンドポイントを追加する。
+ * 画像をアップロード／ダウンロードするエンドポイントを追加する。
  *
  * @param {string} urlPath エンドポイントの URL パス
- * @param {string} storageDir ファイルを保存／取得するディレクトリ
- * @param {Record<string, string>} mimeTypes Content-Type とファイル拡張子の対応
+ * @param {string} storageDir 画像を保存／取得するディレクトリ
  * @return {Middleware}
  */
-function storage(urlPath, storageDir, mimeTypes) {
+function imageStorage(urlPath, storageDir) {
+  /**
+   * ディレクトリトラバーサルを防止したパスを返す。
+   * @param {string} filename
+   */
+  const safeFilePath = (filename) =>
+    path.join(storageDir, path.normalize(`/${filename}`))
+
   return async (req, res, next) => {
     // ダウンロード
     if (req.method === "GET" && req.path.startsWith(`${urlPath}/`)) {
       // /url/:filename -> "", "url", ":filename"
       const [, , filename] = req.path.split("/")
-      const filePath = path.join(storageDir, path.normalize(filename))
-      const mimeType = mimeTypes[path.extname(filePath).toLowerCase()]
+      const filePath = safeFilePath(filename)
 
-      res.setHeader("Content-Type", mimeType || "application/octet-stream")
+      res.setHeader(
+        "Content-Type",
+        `image/${path.extname(filePath).slice(1).toLowerCase()}`
+      )
 
       try {
         await new Promise((resolve, reject) => {
@@ -61,16 +64,19 @@ function storage(urlPath, storageDir, mimeTypes) {
 
     // アップロード
     if (req.method === "POST" && req.path === urlPath) {
-      const [extname] =
-        Object.entries(mimeTypes).find(([, mimeType]) =>
-          req.headers["content-type"].startsWith(mimeType)
-        ) || []
-      if (!extname) {
+      // e.g.) text/html; charset=UTF-8 -> "text/html", "charset=UTF-8"
+      const [mediaType] = req.headers["content-type"].split(/\s*;\s*/)
+      // e.g.) text/html -> "text", "html"
+      const [type, subtype] = mediaType.split("/")
+      if (type !== "image") {
         res.status(415).send()
         return
       }
 
-      const filePath = path.join(storageDir, `${Date.now()}${extname}`)
+      const extname = `.${subtype}`
+      // e.g.) 1619739576528.jpeg
+      const filename = `${Date.now()}${extname}`
+      const filePath = safeFilePath(filename)
 
       try {
         await new Promise((resolve, reject) => {
@@ -97,7 +103,7 @@ function storage(urlPath, storageDir, mimeTypes) {
     if (req.method === "DELETE" && req.path.startsWith(`${urlPath}/`)) {
       // /url/:filename -> "", "url", ":filename"
       const [, , filename] = req.path.split("/")
-      const filePath = path.join(storageDir, path.normalize(filename))
+      const filePath = safeFilePath(filename)
 
       await fs.promises.unlink(filePath).catch(() => null)
 

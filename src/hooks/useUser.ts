@@ -1,31 +1,62 @@
-import { createContext, useContext } from "react"
+import useSWR, { mutate } from "swr"
+import { UserEntity } from "../entity-types"
+import { ENV_API_ENDPOINT } from "../env"
 
-/**
- * サインインしているユーザーのプロフィール。
- */
-export interface User {
+interface User {
   uid: string
   displayName?: string
   photoURL?: string
 }
 
 /**
- * サインインしているユーザーのプロフィールを取得する。
- *
- * UserProvider の配下で使う必要がある。
+ * ユーザー情報を非同期で取得する。
  */
-export function useUser(): User {
-  const user = useContext(UserContext)
-  if (!user) {
-    throw new Error("UserProvider で囲んでいないか value が null です")
+export function useUser(id: string | null): User | null {
+  const user$ = useSWR<UserEntity>(
+    id ? `/users/${id}` : null,
+
+    async (path: string) => {
+      const resp = await fetch(`${ENV_API_ENDPOINT}${path}`)
+      if (!resp.ok) {
+        throw new Error(
+          `${resp.status} ${resp.statusText} ${await resp.text()}`
+        )
+      }
+
+      return await resp.json()
+    }
+  )
+  if (!user$.data) {
+    return null
   }
 
-  return user
+  const { id: uid, displayName, photoURL } = user$.data
+  return {
+    uid,
+    displayName,
+    photoURL: photoURL ?? undefined,
+  }
 }
 
-const UserContext = createContext<User | null>(null)
-
 /**
- * サインインしているユーザーのプロフィールを提供する。
+ * ユーザー情報を更新する。
  */
-export const UserProvider = UserContext.Provider
+export async function updateUser(
+  id: string,
+  input: Partial<UserEntity>
+): Promise<UserEntity> {
+  const resp = await fetch(`${ENV_API_ENDPOINT}/users/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  })
+  if (!resp.ok) {
+    throw new Error(`${resp.status} ${resp.statusText} ${await resp.text()}`)
+  }
+
+  await mutate(`/users/${id}`)
+
+  return await resp.json()
+}

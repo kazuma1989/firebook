@@ -1,6 +1,6 @@
 import { css, cx } from "@emotion/css"
 import { useRef } from "react"
-import { useUser } from "../hooks/useUser"
+import { useCurrentUser } from "../hooks/useCurrentUser"
 import { AutoSizingTextarea } from "./AutoSizingTextarea"
 import { asNonInteractiveSpan } from "./Button"
 import { ButtonCircle } from "./ButtonCircle"
@@ -41,7 +41,7 @@ export function DialogPostEdit({
   headerChildren?: React.ReactNode
   submitButtonChildren?: React.ReactNode
 }) {
-  const { displayName } = useUser()
+  const { displayName } = useCurrentUser()
 
   const valid = text.trim() !== "" || Boolean(imgSrc)
 
