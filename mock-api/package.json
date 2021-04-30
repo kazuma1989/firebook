@@ -1,0 +1,12 @@
+{
+  "engines": {
+    "node": ">=10.19.0",
+    "npm": ">=6.13.4"
+  },
+  "scripts": {
+    "start": "json-server ./db.json --middlewares ./middlewares.js --port 5000 --watch"
+  },
+  "devDependencies": {
+    "json-server": "0.16.x"
+  }
+}
