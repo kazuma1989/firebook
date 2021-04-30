@@ -1,6 +1,10 @@
 [
   {
     "action": "remove",
-    "files": [".node-version", "package-lock.json"]
+    "files": [
+      ".node-version",
+      "package-lock.json",
+      "mock-api/package-lock.json"
+    ]
   }
 ]
