@@ -21,7 +21,10 @@ a:any-link {
 
 /* ress.css で無効になったアウトラインを復活させる */
 a:active,
-a:hover,
+a:hover {
+  outline-width: revert;
+}
+
 a:focus,
 button:focus,
 input:focus,
