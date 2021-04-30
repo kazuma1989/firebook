@@ -148,7 +148,7 @@ export function PostInput({
             } catch (error: unknown) {
               console.error(error)
 
-              setImgUploadProgress(0)
+              setImgUploadProgress(undefined)
               setSubmitting(false)
 
               alert("投稿できませんでした。")

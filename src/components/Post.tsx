@@ -235,8 +235,8 @@ export function Post({
                   ? likes.filter((v) => v !== uid)
                   : [...likes, uid],
               })
-            } catch (e) {
-              console.error(e)
+            } catch (error: unknown) {
+              console.error(error)
 
               alert("いいねできませんでした。")
             }

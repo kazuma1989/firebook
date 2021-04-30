@@ -72,8 +72,8 @@ export function PageSignIn() {
               await auth.signIn(email, password)
 
               setSigningIn(false)
-            } catch (e) {
-              console.error(e)
+            } catch (error: unknown) {
+              console.error(error)
 
               setSigningIn(false)
               setErrorMessage(

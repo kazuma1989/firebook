@@ -333,9 +333,10 @@ function EditModal({
 
             resetAll()
             onFinish?.()
-          } catch (e) {
-            console.error(e)
+          } catch (error: unknown) {
+            console.error(error)
 
+            setImgUploadProgress(undefined)
             setSubmitting(false)
 
             alert("投稿できませんでした。")
