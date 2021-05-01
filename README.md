@@ -11,7 +11,7 @@ Firebook という架空の SNS サイトを実装しながら学習するため
 次のパッケージをあらかじめセットアップしてあります。
 
 - Emotion
-- React (+ React Router)
+- React
 - ESLint
 - Prettier
 - Snowpack
