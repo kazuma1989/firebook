@@ -16,11 +16,14 @@ export function useComments(
   postId: string | undefined,
   limit: number
 ): Comment[] {
-  const comments$ = useSWR<CommentEntity[]>(
-    `${ENV_API_ENDPOINT}/comments?postId=${postId}`
-  )
+  const comments$ = useSWR<CommentEntity[]>(`${ENV_API_ENDPOINT}/comments`)
 
-  const comments = comments$.data?.slice(-limit).reverse()
+  const comments = (postId
+    ? comments$.data?.filter((c) => c.postId === postId)
+    : comments$.data
+  )
+    ?.slice(-limit)
+    .reverse()
 
   return comments ?? []
 }
@@ -44,7 +47,7 @@ export async function addComment(
 
   await Promise.all([
     mutate(`${ENV_API_ENDPOINT}/posts`),
-    mutate(`${ENV_API_ENDPOINT}/comments?postId=${input.postId}`),
+    mutate(`${ENV_API_ENDPOINT}/comments`),
   ])
 
   return await resp.json()
@@ -53,7 +56,7 @@ export async function addComment(
 /**
  * コメントを削除する。
  */
-export async function removeComment(id: string, postId: string): Promise<void> {
+export async function removeComment(id: string): Promise<void> {
   const resp = await fetch(`${ENV_API_ENDPOINT}/comments/${id}`, {
     method: "DELETE",
   })
@@ -63,6 +66,6 @@ export async function removeComment(id: string, postId: string): Promise<void> {
 
   await Promise.all([
     mutate(`${ENV_API_ENDPOINT}/posts`),
-    mutate(`${ENV_API_ENDPOINT}/comments?postId=${postId}`),
+    mutate(`${ENV_API_ENDPOINT}/comments`),
   ])
 }

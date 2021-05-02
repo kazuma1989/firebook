@@ -83,7 +83,7 @@ export function CommentArea({
             onSubmit={async () => {
               finishConfirmingDeleteComment()
 
-              await removeComment(deletingCommentId, postId)
+              await removeComment(deletingCommentId)
             }}
           />
         </ModalBackdrop>
