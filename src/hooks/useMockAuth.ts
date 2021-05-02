@@ -91,11 +91,13 @@ class AuthStateStorage {
       `${ENV_API_ENDPOINT}/insecureAuthInfo?${search.toString()}`
     ).then((r) => r.json())
 
-    if (!authInfo) {
+    if (!authInfo?.uid) {
       throw new Error("サインインに失敗しました。")
     }
 
-    this.currentUser = authInfo
+    this.currentUser = {
+      uid: authInfo.uid,
+    }
     this.storage.save(authInfo.uid)
   }
 
@@ -118,7 +120,7 @@ class AuthStateStorage {
     password: string,
     displayName: string
   ): Promise<void> {
-    const { id: uid }: UserEntity = await fetch(`${ENV_API_ENDPOINT}/users`, {
+    const { id }: UserEntity = await fetch(`${ENV_API_ENDPOINT}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -136,17 +138,21 @@ class AuthStateStorage {
       body: JSON.stringify({
         email,
         insecurePlainPassword: password,
-        uid,
+        uid: id,
       }),
     })
-
     if (!resp.ok) {
       throw new Error("サインアップに失敗しました。")
     }
 
     const authInfo: InsecureAuthInfoEntity = await resp.json()
+    if (!authInfo.uid) {
+      throw new Error("サインアップに失敗しました。")
+    }
 
-    this.currentUser = authInfo
+    this.currentUser = {
+      uid: authInfo.uid,
+    }
     this.storage.save(authInfo.uid)
   }
 }
