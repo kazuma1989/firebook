@@ -13,18 +13,7 @@ interface User {
  */
 export function useUser(id: string | undefined): User | null {
   const user$ = useSWR<UserEntity>(
-    id ? `/users/${id}` : null,
-
-    async (path: string) => {
-      const resp = await fetch(`${ENV_API_ENDPOINT}${path}`)
-      if (!resp.ok) {
-        throw new Error(
-          `${resp.status} ${resp.statusText} ${await resp.text()}`
-        )
-      }
-
-      return await resp.json()
-    }
+    id ? `${ENV_API_ENDPOINT}/users/${id}` : null
   )
   if (!user$.data) {
     return null
@@ -56,7 +45,7 @@ export async function updateUser(
     throw new Error(`${resp.status} ${resp.statusText} ${await resp.text()}`)
   }
 
-  await mutate(`/users/${id}`)
+  await mutate(`${ENV_API_ENDPOINT}/users/${id}`)
 
   return await resp.json()
 }

@@ -17,21 +17,12 @@ export function useComments(
   limit: number
 ): Comment[] {
   const comments$ = useSWR<CommentEntity[]>(
-    `/comments?postId=${postId}`,
-
-    async (path: string) => {
-      const resp = await fetch(`${ENV_API_ENDPOINT}${path}`)
-      if (!resp.ok) {
-        throw new Error(
-          `${resp.status} ${resp.statusText} ${await resp.text()}`
-        )
-      }
-
-      return await resp.json()
-    }
+    `${ENV_API_ENDPOINT}/comments?postId=${postId}`
   )
 
-  return comments$.data?.slice(-limit).reverse() ?? []
+  const comments: Comment[] = comments$.data?.slice(-limit).reverse() ?? []
+
+  return comments
 }
 
 /**
@@ -52,8 +43,8 @@ export async function addComment(
   }
 
   await Promise.all([
-    mutate("/posts"),
-    mutate(`/comments?postId=${input.postId}`),
+    mutate(`${ENV_API_ENDPOINT}/posts`),
+    mutate(`${ENV_API_ENDPOINT}/comments?postId=${input.postId}`),
   ])
 
   return await resp.json()
@@ -70,5 +61,8 @@ export async function removeComment(id: string, postId: string): Promise<void> {
     throw new Error(`${resp.status} ${resp.statusText} ${await resp.text()}`)
   }
 
-  await Promise.all([mutate("/posts"), mutate(`/comments?postId=${postId}`)])
+  await Promise.all([
+    mutate(`${ENV_API_ENDPOINT}/posts`),
+    mutate(`${ENV_API_ENDPOINT}/comments?postId=${postId}`),
+  ])
 }

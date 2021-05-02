@@ -18,29 +18,14 @@ interface Post {
  * targetUID の指定があるときはそのユーザーの投稿だけを、指定がないときは全部の投稿を表示する。
  */
 export function usePosts(targetUID: string | undefined, limit: number): Post[] {
-  const posts$ = useSWR<PostEntity[]>(
-    "/posts",
+  const posts$ = useSWR<PostEntity[]>(`${ENV_API_ENDPOINT}/posts`)
 
-    async (path: string) => {
-      const resp = await fetch(`${ENV_API_ENDPOINT}${path}`)
-      if (!resp.ok) {
-        throw new Error(
-          `${resp.status} ${resp.statusText} ${await resp.text()}`
-        )
-      }
-
-      return await resp.json()
-    }
-  )
-
-  const posts =
+  const posts: Post[] =
     (targetUID
       ? posts$.data?.filter((p) => p.author === targetUID)
-      : posts$.data) ?? []
-
-  return (
-    posts
-      .slice(-limit)
+      : posts$.data
+    )
+      ?.slice(-limit)
       .map(({ id, author, text, imgSrc, postedAt, likes, totalComments }) => ({
         id,
         author,
@@ -51,7 +36,8 @@ export function usePosts(targetUID: string | undefined, limit: number): Post[] {
         totalComments,
       }))
       .reverse() ?? []
-  )
+
+  return posts
 }
 
 /**
@@ -71,7 +57,7 @@ export async function addPost(
     throw new Error(`${resp.status} ${resp.statusText} ${await resp.text()}`)
   }
 
-  await mutate("/posts")
+  await mutate(`${ENV_API_ENDPOINT}/posts`)
 
   return await resp.json()
 }
@@ -94,7 +80,7 @@ export async function updatePost(
     throw new Error(`${resp.status} ${resp.statusText} ${await resp.text()}`)
   }
 
-  await mutate("/posts")
+  await mutate(`${ENV_API_ENDPOINT}/posts`)
 
   return await resp.json()
 }
@@ -110,5 +96,5 @@ export async function removePost(id: string): Promise<void> {
     throw new Error(`${resp.status} ${resp.statusText} ${await resp.text()}`)
   }
 
-  await mutate("/posts")
+  await mutate(`${ENV_API_ENDPOINT}/posts`)
 }
