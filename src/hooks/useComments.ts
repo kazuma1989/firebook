@@ -10,7 +10,7 @@ interface Comment {
 }
 
 /**
- * 投稿に対するコメントを非同期で取得する。
+ * 投稿に対するコメントを取得する。
  */
 export function useComments(
   postId: string | undefined,
@@ -20,9 +20,9 @@ export function useComments(
     `${ENV_API_ENDPOINT}/comments?postId=${postId}`
   )
 
-  const comments: Comment[] = comments$.data?.slice(-limit).reverse() ?? []
+  const comments = comments$.data?.slice(-limit).reverse()
 
-  return comments
+  return comments ?? []
 }
 
 /**

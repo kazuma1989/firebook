@@ -6,7 +6,7 @@ interface Author {
 }
 
 /**
- * 投稿者の情報を非同期で取得する。
+ * 投稿者の情報を取得する。
  */
 export function useAuthor(authorId: string | undefined): Author | null {
   return useUser(authorId)

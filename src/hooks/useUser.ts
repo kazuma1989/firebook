@@ -9,7 +9,7 @@ interface User {
 }
 
 /**
- * ユーザー情報を非同期で取得する。
+ * ユーザー情報を取得する。
  */
 export function useUser(id: string | undefined): User | null {
   const user$ = useSWR<UserEntity>(

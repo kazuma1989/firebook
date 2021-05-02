@@ -13,20 +13,20 @@ interface Post {
 }
 
 /**
- * 投稿を非同期で取得する。
+ * 投稿を取得する。
  *
  * targetUID の指定があるときはそのユーザーの投稿だけを、指定がないときは全部の投稿を表示する。
  */
 export function usePosts(targetUID: string | undefined, limit: number): Post[] {
   const posts$ = useSWR<PostEntity[]>(`${ENV_API_ENDPOINT}/posts`)
 
-  const posts: Post[] =
-    (targetUID
-      ? posts$.data?.filter((p) => p.author === targetUID)
-      : posts$.data
-    )
-      ?.slice(-limit)
-      .map(({ id, author, text, imgSrc, postedAt, likes, totalComments }) => ({
+  const posts = (targetUID
+    ? posts$.data?.filter((p) => p.author === targetUID)
+    : posts$.data
+  )
+    ?.slice(-limit)
+    .map(
+      ({ id, author, text, imgSrc, postedAt, likes, totalComments }): Post => ({
         id,
         author,
         text: text ?? undefined,
@@ -34,10 +34,11 @@ export function usePosts(targetUID: string | undefined, limit: number): Post[] {
         postedAt,
         likes,
         totalComments,
-      }))
-      .reverse() ?? []
+      })
+    )
+    .reverse()
 
-  return posts
+  return posts ?? []
 }
 
 /**
