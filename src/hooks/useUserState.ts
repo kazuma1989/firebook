@@ -15,7 +15,7 @@ export function useUserState(): UserState {
   const authState = useAuthState()
 
   const user = useUser(
-    !authState.loading && authState.uid ? authState.uid : null
+    !authState.loading && authState.uid ? authState.uid : undefined
   )
 
   if (user) {

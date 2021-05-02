@@ -11,7 +11,7 @@ interface User {
 /**
  * ユーザー情報を非同期で取得する。
  */
-export function useUser(id: string | null): User | null {
+export function useUser(id: string | undefined): User | null {
   const user$ = useSWR<UserEntity>(
     id ? `/users/${id}` : null,
 
