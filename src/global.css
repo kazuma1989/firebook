@@ -30,7 +30,9 @@ button:focus,
 input:focus,
 select:focus,
 textarea:focus {
-  outline: solid medium var(--color-primary-50);
+  /* https://css-tricks.com/copy-the-browsers-native-focus-styles/ */
+  outline: solid medium Highlight;
+  outline: solid medium -webkit-focus-ring-color;
 }
 
 /* https://stackoverflow.com/a/23860302/8662861 */
