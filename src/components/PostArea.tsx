@@ -286,6 +286,7 @@ function EditModal({
               case "changed": {
                 const uploadTask = uploadFile(imageUpdate.file)
 
+                setImgUploadProgress(0)
                 const unsubscribe = uploadTask.onProgress(
                   ({ bytesTransferred, totalBytes }) => {
                     setImgUploadProgress((bytesTransferred / totalBytes) * 100)

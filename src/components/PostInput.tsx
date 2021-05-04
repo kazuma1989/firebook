@@ -122,6 +122,7 @@ export function PostInput({
               if (draft.img?.file) {
                 const uploadTask = uploadFile(draft.img.file)
 
+                setImgUploadProgress(0)
                 const unsubscribe = uploadTask.onProgress(
                   ({ bytesTransferred, totalBytes }) => {
                     setImgUploadProgress((bytesTransferred / totalBytes) * 100)

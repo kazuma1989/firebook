@@ -50,7 +50,7 @@ export function ProfileArea({
     setImgFile(null)
   }
 
-  const setUploadProgress = (progress: number | undefined) => {
+  const setImgUploadProgress = (progress: number | undefined) => {
     _setImg((img) => {
       // アップロード中でないか進捗が同じときは何もしない。
       if (!img || img.uploadProgress === progress) {
@@ -163,14 +163,15 @@ export function ProfileArea({
               disabled={img.uploadProgress !== undefined}
               onCancel={clearImg}
               onSubmit={async () => {
-                setUploadProgress(0)
-
                 try {
                   const uploadTask = uploadFile(img.file)
 
+                  setImgUploadProgress(0)
                   const unsubscribe = uploadTask.onProgress(
                     ({ bytesTransferred, totalBytes }) => {
-                      setUploadProgress((bytesTransferred / totalBytes) * 100)
+                      setImgUploadProgress(
+                        (bytesTransferred / totalBytes) * 100
+                      )
                     }
                   )
 
@@ -191,7 +192,7 @@ export function ProfileArea({
                 } catch (error: unknown) {
                   console.error(error)
 
-                  setUploadProgress(undefined)
+                  setImgUploadProgress(undefined)
 
                   alert("プロフィールを変更できませんでした。")
                 }
