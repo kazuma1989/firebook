@@ -18,6 +18,7 @@ export function DialogPostEdit({
   text = "",
   imgSrc,
   uploadProgress,
+  invalid,
   submitting,
   onTextChange,
   onImgChange,
@@ -31,6 +32,7 @@ export function DialogPostEdit({
   text?: string
   imgSrc?: string
   uploadProgress?: number
+  invalid?: boolean
   submitting?: boolean
   onTextChange?(text: string): void
   onImgChange?(file: File | null): void
@@ -42,8 +44,6 @@ export function DialogPostEdit({
   submitButtonChildren?: React.ReactNode
 }) {
   const { displayName } = useCurrentUser()
-
-  const valid = text.trim() !== "" || Boolean(imgSrc)
 
   const textarea$ = useRef<HTMLTextAreaElement>(null)
 
@@ -75,7 +75,7 @@ export function DialogPostEdit({
           }}
           onKeyDown={(e) => {
             if (e.nativeEvent.isComposing) return
-            if (!valid) return
+            if (invalid) return
 
             // Command/Control + Enter 入力で送信
             if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
@@ -218,7 +218,7 @@ export function DialogPostEdit({
           />
         </Dialog.Button>
 
-        <Dialog.ButtonSubmit disabled={!valid || submitting}>
+        <Dialog.ButtonSubmit disabled={invalid || submitting}>
           {submitButtonChildren}
         </Dialog.ButtonSubmit>
       </Dialog.Footer>

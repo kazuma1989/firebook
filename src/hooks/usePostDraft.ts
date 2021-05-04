@@ -67,12 +67,14 @@ export function usePostDraft(initialText: string = "", initialImgSrc?: string) {
   }
 
   const dirty = text !== initialText || img?.src !== initialImgSrc
+  const valid = text.trim() !== "" || Boolean(img)
 
   return [
     {
       text,
       img,
       dirty,
+      valid,
     },
     {
       setText,

@@ -205,6 +205,7 @@ function EditModal({
         text={draft.text}
         imgSrc={draft.img?.src}
         uploadProgress={draft.img?.uploadProgress}
+        invalid={!draft.valid}
         submitting={submitting}
         onTextChange={setText}
         onImgChange={setImgFile}
