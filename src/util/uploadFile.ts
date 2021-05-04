@@ -65,10 +65,10 @@ export function uploadFile(file: File) {
         })
       }
 
-      xhr.addEventListener("progress", progress)
+      xhr.upload.addEventListener("progress", progress)
 
       return () => {
-        xhr.removeEventListener("progress", progress)
+        xhr.upload.removeEventListener("progress", progress)
       }
     },
   }
