@@ -28,14 +28,20 @@ export const CommentInput = forwardRef(function CommentInput(
   const valid = text.trim() !== ""
 
   const submit = async () => {
-    setText("")
+    try {
+      await addComment({
+        postId,
+        author: uid,
+        text,
+        postedAt: Date.now(),
+      })
 
-    await addComment({
-      postId,
-      author: uid,
-      text,
-      postedAt: Date.now(),
-    })
+      setText("")
+    } catch (error: unknown) {
+      console.error(error)
+
+      alert("コメントできませんでした。")
+    }
   }
 
   return (
