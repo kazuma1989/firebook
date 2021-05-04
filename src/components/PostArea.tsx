@@ -193,9 +193,7 @@ function EditModal({
     <ModalBackdrop
       initialFocus="[data-textarea-main]"
       onCancel={() => {
-        if (draft.dirty) {
-          return
-        }
+        if (draft.dirty) return
 
         resetAll()
         onCancel?.()

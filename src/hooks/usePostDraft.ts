@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface DraftImg {
   src: string
@@ -28,12 +28,16 @@ export function usePostDraft(initialText: string = "", initialImgSrc?: string) {
     : null
 
   const [img, _setImg] = useState(initialImg)
+  useEffect(() => {
+    return () => {
+      if (img?.src) {
+        URL.revokeObjectURL(img.src)
+      }
+    }
+  }, [img?.src])
+
   const resetImg = () => {
     _setImg(initialImg)
-
-    if (img?.src) {
-      URL.revokeObjectURL(img.src)
-    }
   }
 
   const setImgFile = (file: File | null) => {
@@ -45,10 +49,6 @@ export function usePostDraft(initialText: string = "", initialImgSrc?: string) {
       })
     } else {
       _setImg(null)
-    }
-
-    if (img?.src) {
-      URL.revokeObjectURL(img.src)
     }
   }
 

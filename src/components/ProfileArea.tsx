@@ -1,5 +1,5 @@
 import { css, cx } from "@emotion/css"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useCurrentUser } from "../hooks/useCurrentUser"
 import { updateUser } from "../hooks/useUser"
 import { removeFile } from "../util/removeFile"
@@ -29,6 +29,13 @@ export function ProfileArea({
     file: File
     uploadProgress: number | undefined
   } | null>(null)
+  useEffect(() => {
+    return () => {
+      if (img?.src) {
+        URL.revokeObjectURL(img.src)
+      }
+    }
+  }, [img?.src])
 
   const setImgFile = (file: File | null) => {
     if (file) {
@@ -39,10 +46,6 @@ export function ProfileArea({
       })
     } else {
       _setImg(null)
-    }
-
-    if (img?.src) {
-      URL.revokeObjectURL(img.src)
     }
   }
 
