@@ -36,18 +36,20 @@ export class MockAuth {
   /**
    * ストレージ。
    */
-  private readonly storage: Storage
+  private readonly storage = globalThis.sessionStorage
+  private readonly storageKey = "firebook.currentUserUID"
+
+  /**
+   * 通知用インスタンス。
+   */
+  private readonly eventTarget = new EventTarget()
+  private readonly eventName = "firebook.currentUserUID"
 
   /**
    * コンストラクター。
    */
   constructor() {
-    this.storage = new Storage(
-      "firebook.currentUserUID",
-      globalThis.sessionStorage
-    )
-
-    const uid = this.storage.load()
+    const uid = this.storage.getItem(this.storageKey)
     if (uid) {
       this.currentUser = { uid }
     }
@@ -59,14 +61,19 @@ export class MockAuth {
    * サインイン状態が変化したら通知を受け取る。
    */
   onAuthStateChanged(listener: AuthStateListener): () => void {
-    if (this.initialized) {
-      // 追加タイミングによっては通知を逃すかもしれないので、追加直後に一度通知する。
+    const _listener = () => {
       listener(this.currentUser)
     }
 
-    return this.storage.subscribe(() => {
-      listener(this.currentUser)
-    })
+    if (this.initialized) {
+      // 追加タイミングによっては通知を逃すかもしれないので、追加直後に一度通知する。
+      _listener()
+    }
+
+    this.eventTarget.addEventListener(this.eventName, _listener)
+    return () => {
+      this.eventTarget.removeEventListener(this.eventName, _listener)
+    }
   }
 
   /**
@@ -89,10 +96,10 @@ export class MockAuth {
       throw new Error("サインインに失敗しました。")
     }
 
-    this.currentUser = {
-      uid: authInfo.uid,
-    }
-    this.storage.save(authInfo.uid)
+    const { uid } = authInfo
+    this.currentUser = { uid }
+    this.storage.setItem(this.storageKey, uid)
+    this.eventTarget.dispatchEvent(new Event(this.eventName))
   }
 
   /**
@@ -100,7 +107,8 @@ export class MockAuth {
    */
   async signOut(): Promise<void> {
     this.currentUser = null
-    this.storage.clear()
+    this.storage.removeItem(this.storageKey)
+    this.eventTarget.dispatchEvent(new Event(this.eventName))
   }
 
   /**
@@ -144,10 +152,10 @@ export class MockAuth {
       throw new Error("サインアップに失敗しました。")
     }
 
-    this.currentUser = {
-      uid: authInfo.uid,
-    }
-    this.storage.save(authInfo.uid)
+    const { uid } = authInfo
+    this.currentUser = { uid }
+    this.storage.setItem(this.storageKey, uid)
+    this.eventTarget.dispatchEvent(new Event(this.eventName))
   }
 }
 
@@ -163,58 +171,4 @@ interface CurrentUser {
  */
 interface AuthStateListener {
   (currentUser: CurrentUser | null): void
-}
-
-/**
- * 変更を通知するストレージラッパー。
- */
-class Storage {
-  private readonly listeners: StorageListener[] = []
-
-  constructor(
-    private readonly key: string,
-    private readonly storage: globalThis.Storage
-  ) {}
-
-  load(): string | null {
-    return this.storage.getItem(this.key)
-  }
-
-  save(value: string): void {
-    this.storage.setItem(this.key, value)
-
-    this.notify()
-  }
-
-  clear(): void {
-    this.storage.removeItem(this.key)
-
-    this.notify()
-  }
-
-  subscribe(listener: StorageListener): () => void {
-    this.listeners.push(listener)
-
-    const unsubscribe = () => {
-      const index = this.listeners.lastIndexOf(listener)
-      if (index === -1) return
-
-      this.listeners.splice(index, 1)
-    }
-
-    return unsubscribe
-  }
-
-  private notify() {
-    this.listeners.forEach((listener) => {
-      listener()
-    })
-  }
-}
-
-/**
- * 通知を受け取るコールバック。
- */
-interface StorageListener {
-  (): void
 }
