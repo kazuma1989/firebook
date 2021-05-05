@@ -10,7 +10,6 @@ import { ModalBackdrop } from "./ModalBackdrop"
 
 /**
  * 新しい投稿を入力するエリア。
- * クリックするとダイアログが開く。
  */
 export function PostInput({
   className,
