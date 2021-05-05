@@ -171,21 +171,14 @@ function EditModal({
   onDiscard?(): void
   onFinish?(): void
 }) {
-  const [
-    draft,
-    { setText, resetText, resetImg, setImgFile, setImgUploadProgress },
-  ] = usePostDraft(initialText, initialImgSrc)
+  const [draft, { setText, setImgFile, setImgUploadProgress }] = usePostDraft(
+    initialText,
+    initialImgSrc
+  )
 
   const [submitting, setSubmitting] = useState(false)
   const [confirming, setConfirming] = useState(false)
   const stopConfirming = () => {
-    setConfirming(false)
-  }
-
-  const resetAll = () => {
-    resetText()
-    resetImg()
-    setSubmitting(false)
     setConfirming(false)
   }
 
@@ -195,7 +188,6 @@ function EditModal({
       onCancel={() => {
         if (draft.dirty) return
 
-        resetAll()
         onCancel?.()
       }}
     >
@@ -215,7 +207,6 @@ function EditModal({
             return
           }
 
-          resetAll()
           onCancel?.()
         }}
         onSubmit={async () => {
@@ -331,7 +322,8 @@ function EditModal({
               }
             }
 
-            resetAll()
+            setSubmitting(false)
+
             onFinish?.()
           } catch (error: unknown) {
             console.error(error)
@@ -351,10 +343,7 @@ function EditModal({
         >
           <DiscardConfirmationDialog
             onCancel={stopConfirming}
-            onSubmit={() => {
-              resetAll()
-              onDiscard?.()
-            }}
+            onSubmit={onDiscard}
           />
         </ModalBackdrop>
       )}

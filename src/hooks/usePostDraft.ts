@@ -9,11 +9,8 @@ import { useImageDraft } from "./useImageDraft"
  */
 export function usePostDraft(initialText: string = "", initialImgSrc?: string) {
   const [text, setText] = useState(initialText)
-  const resetText = () => {
-    setText(initialText)
-  }
 
-  const [img, { setImgFile, setImgUploadProgress, resetImg }] = useImageDraft(
+  const [img, { setImgFile, setImgUploadProgress }] = useImageDraft(
     initialImgSrc
   )
 
@@ -29,8 +26,6 @@ export function usePostDraft(initialText: string = "", initialImgSrc?: string) {
     },
     {
       setText,
-      resetText,
-      resetImg,
       setImgFile,
       setImgUploadProgress,
     },

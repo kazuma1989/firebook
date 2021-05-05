@@ -20,18 +20,9 @@ export function PostInput({
 }) {
   const { uid, displayName, photoURL } = useCurrentUser()
 
-  const [
-    draft,
-    { setText, resetText, resetImg, setImgFile, setImgUploadProgress },
-  ] = usePostDraft()
+  const [draft, { setText, setImgFile, setImgUploadProgress }] = usePostDraft()
 
   const [submitting, setSubmitting] = useState(false)
-
-  const resetAll = () => {
-    resetText()
-    resetImg()
-    setSubmitting(false)
-  }
 
   const [dialogVisible, setDialogVisible] = useState(false)
   const openDialog = () => {
@@ -144,8 +135,11 @@ export function PostInput({
                 totalComments: 0,
               })
 
+              setText("")
+              setImgFile(null)
+              setSubmitting(false)
+
               closeDialog()
-              resetAll()
             } catch (error: unknown) {
               console.error(error)
 

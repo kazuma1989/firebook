@@ -50,16 +50,11 @@ export function useImageDraft(initialImgSrc?: string) {
     })
   }
 
-  const resetImg = () => {
-    _setImg(initialImg)
-  }
-
   return [
     img,
     {
       setImgFile,
       setImgUploadProgress,
-      resetImg,
     },
   ] as const
 }
