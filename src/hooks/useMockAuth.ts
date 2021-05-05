@@ -20,6 +20,20 @@ const MockAuthContext = createContext<MockAuth | null>(null)
 export const MockAuthProvider = MockAuthContext.Provider
 
 /**
+ * サインイン中のユーザーの情報。
+ */
+interface CurrentUser {
+  uid: string
+}
+
+/**
+ * サインイン状態が変化したら通知を受け取るコールバック。
+ */
+interface AuthStateListener {
+  (currentUser: CurrentUser | null): void
+}
+
+/**
  * サインイン状態を保持するクラス。
  */
 export class MockAuth {
@@ -157,18 +171,4 @@ export class MockAuth {
     this.storage.setItem(this.storageKey, uid)
     this.eventTarget.dispatchEvent(new Event(this.eventName))
   }
-}
-
-/**
- * サインイン中のユーザーの情報。
- */
-interface CurrentUser {
-  uid: string
-}
-
-/**
- * サインイン状態が変化したら通知を受け取るコールバック。
- */
-interface AuthStateListener {
-  (currentUser: CurrentUser | null): void
 }
