@@ -1,3 +1,4 @@
+import { createContext, useContext } from "react"
 import { InsecureAuthInfoEntity, UserEntity } from "../entity-types"
 import { ENV_API_ENDPOINT } from "../env"
 
@@ -5,30 +6,23 @@ import { ENV_API_ENDPOINT } from "../env"
  * サインイン機能をモックする。
  * Session storage にサインイン状態を記録するので、ブラウザーを開いている間は持続する。
  */
-export function useMockAuth(): AuthStateStorage {
-  return AuthStateStorage.getInstance()
-}
-
-/**
- * サインイン状態を保持するシングルトンなクラス。
- */
-class AuthStateStorage {
-  /**
-   * シングルトンインスタンス。
-   */
-  private static instance?: AuthStateStorage
-
-  /**
-   * シングルトンインスタンスを取得する。
-   */
-  static getInstance(): AuthStateStorage {
-    if (!AuthStateStorage.instance) {
-      AuthStateStorage.instance = new AuthStateStorage()
-    }
-
-    return AuthStateStorage.instance
+export function useMockAuth(): MockAuth {
+  const mockAuth = useContext(MockAuthContext)
+  if (!mockAuth) {
+    throw new Error("MockAuthProvider で囲んでいないか value が null です")
   }
 
+  return mockAuth
+}
+
+const MockAuthContext = createContext<MockAuth | null>(null)
+
+export const MockAuthProvider = MockAuthContext.Provider
+
+/**
+ * サインイン状態を保持するクラス。
+ */
+export class MockAuth {
   /**
    * サインイン中のユーザーの情報。
    */
@@ -47,7 +41,7 @@ class AuthStateStorage {
   /**
    * コンストラクター。
    */
-  private constructor() {
+  constructor() {
     this.storage = new Storage(
       "firebook.currentUserUID",
       globalThis.sessionStorage
