@@ -25,6 +25,10 @@ export class ErrorBoundary extends React.Component<Props, State> {
     this.state = {}
   }
 
+  componentDidCatch(error: unknown, errorInfo: unknown) {
+    console.error(error, errorInfo)
+  }
+
   render() {
     const { error } = this.state
     const { children } = this.props
