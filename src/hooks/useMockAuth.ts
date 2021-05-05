@@ -66,9 +66,13 @@ export class MockAuth {
     const uid = this.storage.getItem(this.storageKey)
     if (uid) {
       this.currentUser = { uid }
+      this.storage.setItem(this.storageKey, uid)
+    } else {
+      this.currentUser = null
     }
 
     this.initialized = true
+    this.eventTarget.dispatchEvent(new Event(this.eventName))
   }
 
   /**
@@ -80,7 +84,7 @@ export class MockAuth {
     }
 
     if (this.initialized) {
-      // 追加タイミングによっては通知を逃すかもしれないので、追加直後に一度通知する。
+      // 追加直後にも一度通知する。
       _listener()
     }
 
