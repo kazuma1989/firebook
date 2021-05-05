@@ -50,7 +50,7 @@ export class MockAuth {
   /**
    * ストレージ。
    */
-  private readonly storage = globalThis.sessionStorage
+  private readonly storage = sessionStorage
   private readonly storageKey = "firebook.currentUserUID"
 
   /**
