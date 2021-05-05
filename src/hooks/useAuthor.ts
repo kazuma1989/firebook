@@ -8,6 +8,6 @@ interface Author {
 /**
  * 投稿者の情報を取得する。
  */
-export function useAuthor(authorId: string | undefined): Author | null {
-  return useUser(authorId)
+export function useAuthor(id: string | undefined): Author | null {
+  return useUser(id)
 }
