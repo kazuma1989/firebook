@@ -1,6 +1,6 @@
 import { css, cx } from "@emotion/css"
-import { useEffect, useState } from "react"
 import { useCurrentUser } from "../hooks/useCurrentUser"
+import { useImageDraft } from "../hooks/useImageDraft"
 import { updateUser } from "../hooks/useUser"
 import { removeFile } from "../util/removeFile"
 import { uploadFile } from "../util/uploadFile"
@@ -24,47 +24,9 @@ export function ProfileArea({
 }) {
   const { uid, displayName, photoURL } = useCurrentUser()
 
-  const [img, _setImg] = useState<{
-    src: string
-    file: File
-    uploadProgress: number | undefined
-  } | null>(null)
-  useEffect(() => {
-    return () => {
-      if (img?.src) {
-        URL.revokeObjectURL(img.src)
-      }
-    }
-  }, [img?.src])
-
-  const setImgFile = (file: File | null) => {
-    if (file) {
-      _setImg({
-        src: URL.createObjectURL(file),
-        file,
-        uploadProgress: undefined,
-      })
-    } else {
-      _setImg(null)
-    }
-  }
-
+  const [img, { setImgFile, setImgUploadProgress }] = useImageDraft()
   const clearImg = () => {
     setImgFile(null)
-  }
-
-  const setImgUploadProgress = (progress: number | undefined) => {
-    _setImg((img) => {
-      // アップロード中でないか進捗が同じときは何もしない。
-      if (!img || img.uploadProgress === progress) {
-        return img
-      }
-
-      return {
-        ...img,
-        uploadProgress: progress,
-      }
-    })
   }
 
   return (
@@ -166,6 +128,8 @@ export function ProfileArea({
               disabled={img.uploadProgress !== undefined}
               onCancel={clearImg}
               onSubmit={async () => {
+                if (!img.file) return
+
                 try {
                   const uploadTask = uploadFile(img.file)
 
