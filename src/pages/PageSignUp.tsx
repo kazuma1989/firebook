@@ -5,7 +5,7 @@ import { Button } from "../components/Button"
 import { firebookLogo } from "../components/icon"
 import { Input } from "../components/Input"
 import { LoadingCircle } from "../components/LoadingCircle"
-import { signUp } from "../hooks/useCurrentUserUID"
+import { signUp } from "../hooks/useUserState"
 
 /**
  * あらかじめ入力可能な値。

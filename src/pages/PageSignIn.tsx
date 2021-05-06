@@ -5,7 +5,7 @@ import { Button } from "../components/Button"
 import { firebookLogo } from "../components/icon"
 import { Input } from "../components/Input"
 import { LoadingCircle } from "../components/LoadingCircle"
-import { signIn } from "../hooks/useCurrentUserUID"
+import { signIn } from "../hooks/useUserState"
 import { StatePageSignUp } from "./PageSignUp"
 
 /**
