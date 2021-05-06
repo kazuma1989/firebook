@@ -68,8 +68,6 @@ export function PageSignIn() {
 
             try {
               await signIn(email, password)
-
-              setSigningIn(false)
             } catch (error: unknown) {
               console.error(error)
 

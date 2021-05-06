@@ -85,8 +85,6 @@ export function PageSignUp() {
             try {
               await signUp(email, password, displayName)
 
-              setSigningUp(false)
-
               navigateToHome()
             } catch (error: unknown) {
               console.error(error)
