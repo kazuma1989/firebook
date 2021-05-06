@@ -2,7 +2,7 @@ import { css, cx } from "@emotion/css"
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { useCurrentUser } from "../hooks/useCurrentUser"
-import { useMockAuth } from "../hooks/useMockAuth"
+import { signOut } from "../hooks/useCurrentUserUID"
 import { Avatar } from "./Avatar"
 import { Button } from "./Button"
 import { ButtonCircle } from "./ButtonCircle"
@@ -19,7 +19,6 @@ export function GlobalHeader({
   className?: string
   style?: React.CSSProperties
 }) {
-  const auth = useMockAuth()
   const { displayName, photoURL } = useCurrentUser()
 
   const [menuVisible, setMenuVisible] = useState(false)
@@ -138,7 +137,7 @@ export function GlobalHeader({
               onClick={() => {
                 closeMenu()
 
-                auth.signOut()
+                signOut()
               }}
             >
               サインアウト

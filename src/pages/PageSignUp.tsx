@@ -5,7 +5,7 @@ import { Button } from "../components/Button"
 import { firebookLogo } from "../components/icon"
 import { Input } from "../components/Input"
 import { LoadingCircle } from "../components/LoadingCircle"
-import { useMockAuth } from "../hooks/useMockAuth"
+import { signUp } from "../hooks/useCurrentUserUID"
 
 /**
  * あらかじめ入力可能な値。
@@ -19,8 +19,6 @@ export interface StatePageSignUp {
  * サインアップページ。
  */
 export function PageSignUp() {
-  const auth = useMockAuth()
-
   const history = useHistory()
   const navigateToHome = () => {
     history.push("/")
@@ -85,7 +83,7 @@ export function PageSignUp() {
             setErrorMessage("")
 
             try {
-              await auth.signUp(email, password, displayName)
+              await signUp(email, password, displayName)
 
               setSigningUp(false)
 

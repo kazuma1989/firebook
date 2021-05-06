@@ -5,15 +5,13 @@ import { Button } from "../components/Button"
 import { firebookLogo } from "../components/icon"
 import { Input } from "../components/Input"
 import { LoadingCircle } from "../components/LoadingCircle"
-import { useMockAuth } from "../hooks/useMockAuth"
+import { signIn } from "../hooks/useCurrentUserUID"
 import { StatePageSignUp } from "./PageSignUp"
 
 /**
  * サインインページ。
  */
 export function PageSignIn() {
-  const auth = useMockAuth()
-
   const [signingIn, setSigningIn] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
 
@@ -69,7 +67,7 @@ export function PageSignIn() {
             setErrorMessage("")
 
             try {
-              await auth.signIn(email, password)
+              await signIn(email, password)
 
               setSigningIn(false)
             } catch (error: unknown) {
