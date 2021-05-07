@@ -185,9 +185,9 @@ export function PageSignIn() {
         </div>
 
         <Button
-          render={({ type, ...props }) => (
+          render={(props) => (
             <Link<StatePageSignUp>
-              {...(props as any)}
+              {...props}
               to={{
                 pathname: "/sign-up",
                 state: {

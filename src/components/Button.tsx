@@ -1,6 +1,6 @@
 import { css, cx } from "@emotion/css"
 
-type ButtonElementProps = JSX.IntrinsicElements["button"]
+type ButtonElementProps = React.ButtonHTMLAttributes<HTMLElement>
 
 interface Props extends ButtonElementProps {
   render?(props: ButtonElementProps): JSX.Element
@@ -95,7 +95,6 @@ export function Button({
       }
     },
 
-    type,
     className: buttonStyle,
 
     ...restOfProps,

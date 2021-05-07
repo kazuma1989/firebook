@@ -55,9 +55,7 @@ export function GlobalHeader({
       </Link>
 
       <Button
-        render={({ type, ...props }) => (
-          <Link {...(props as any)} to="/profile" />
-        )}
+        render={(props) => <Link {...props} to="/profile" />}
         className={css`
           display: flex;
           align-items: center;
@@ -116,18 +114,14 @@ export function GlobalHeader({
             `}
           >
             <PopupMenu.Item
-              render={({ type, ...props }) => (
-                <Link {...(props as any)} to="/" />
-              )}
+              render={(props) => <Link {...props} to="/" />}
               onClick={closeMenu}
             >
               ホームに戻る
             </PopupMenu.Item>
 
             <PopupMenu.Item
-              render={({ type, ...props }) => (
-                <Link {...(props as any)} to="/profile" />
-              )}
+              render={(props) => <Link {...props} to="/profile" />}
               onClick={closeMenu}
             >
               自分のプロフィールを見る
