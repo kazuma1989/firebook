@@ -21,7 +21,7 @@ export function PostArea({
   className?: string
   style?: React.CSSProperties
 }) {
-  const posts = usePosts(targetUID, 15)
+  const posts = usePosts(targetUID)
 
   const [deletingState, setDeletingState] = useState<{
     postId: string
