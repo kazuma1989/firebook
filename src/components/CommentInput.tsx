@@ -7,6 +7,8 @@ import { Avatar } from "./Avatar"
 import { ButtonCircle } from "./ButtonCircle"
 import { sendIcon } from "./icon"
 
+export type { Focusable }
+
 /**
  * 投稿へのコメントを入力する欄。
  */
