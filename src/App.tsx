@@ -17,7 +17,7 @@ import { PageSignUp } from "./pages/PageSignUp"
  * - react-router-dom の BrowserRouter.
  */
 export function App() {
-  const { currentUser, loading } = useUserState()
+  const { loading, currentUser } = useUserState()
 
   if (loading) {
     return <PageLoading />
