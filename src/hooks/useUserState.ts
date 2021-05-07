@@ -59,7 +59,7 @@ export async function signIn(email: string, password: string): Promise<void> {
   }
 
   sessionStorage.setItem(storageKey, authInfo.uid)
-  mutate(storageKey)
+  await mutate(storageKey)
 }
 
 /**
@@ -67,7 +67,7 @@ export async function signIn(email: string, password: string): Promise<void> {
  */
 export async function signOut(): Promise<void> {
   sessionStorage.removeItem(storageKey)
-  mutate(storageKey)
+  await mutate(storageKey)
 }
 
 /**
@@ -112,5 +112,5 @@ export async function signUp(
   }
 
   sessionStorage.setItem(storageKey, authInfo.uid)
-  mutate(storageKey)
+  await mutate(storageKey)
 }
