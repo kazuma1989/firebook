@@ -152,9 +152,6 @@ function DeleteConfirmationDialog({
 
 /**
  * 投稿を編集するダイアログとバックドロップ。
- *
- * PostArea は子コンポーネントが多いため、入力中の文字のように頻繁に変わるステートを持たせると UI がカクついてしまう。
- * ダイアログだけ切り出して、文字入力でも UI がカクつかないように対策する。
  */
 function EditModal({
   postId,
