@@ -25,7 +25,7 @@ export function useUserState(): UserState {
     }
   }
 
-  if (!uid$.data) {
+  if (uid$.data === null) {
     return {
       loading: false,
       currentUser: null,
