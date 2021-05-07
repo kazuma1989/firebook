@@ -1,7 +1,7 @@
 import { css, cx } from "@emotion/css"
 import { useRef } from "react"
 import { useCurrentUser } from "../hooks/useCurrentUser"
-import { AutoSizingTextarea } from "./AutoSizingTextarea"
+import { AutoSizingTextarea, Focusable } from "./AutoSizingTextarea"
 import { asNonInteractiveSpan } from "./Button"
 import { ButtonCircle } from "./ButtonCircle"
 import { Dialog } from "./Dialog"
@@ -45,7 +45,7 @@ export function DialogPostEdit({
 }) {
   const { displayName } = useCurrentUser()
 
-  const textarea$ = useRef<HTMLTextAreaElement>(null)
+  const textarea$ = useRef<Focusable>(null)
 
   return (
     <Dialog onSubmit={onSubmit} className={className} style={style}>

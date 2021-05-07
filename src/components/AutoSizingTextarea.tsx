@@ -1,11 +1,17 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react"
 
+export interface Focusable {
+  focus(): void
+}
+
+type TextareaElementProps = JSX.IntrinsicElements["textarea"]
+
 /**
  * textarea 要素のラッパー。
  */
 export const AutoSizingTextarea = forwardRef(function AutoSizingTextarea(
-  props: JSX.IntrinsicElements["textarea"],
-  ref: React.ForwardedRef<HTMLTextAreaElement>
+  props: TextareaElementProps,
+  ref: React.ForwardedRef<Focusable>
 ) {
   // レンダリングのたび、テキストエリアを内容に合わせた高さに調整する。
   const textarea$ = useRef<HTMLTextAreaElement>(null)
@@ -17,10 +23,16 @@ export const AutoSizingTextarea = forwardRef(function AutoSizingTextarea(
     textarea.style.height = `${textarea.scrollHeight}px`
   })
 
-  // 内部で ref を使いつつ、外部にも ref を公開する。
-  useImperativeHandle<HTMLTextAreaElement | null, HTMLTextAreaElement | null>(
+  // 内部で ref を使いつつ、外部にも ref の機能を公開する。
+  useImperativeHandle(
     ref,
-    () => textarea$.current,
+    () => {
+      return {
+        focus() {
+          textarea$.current?.focus()
+        },
+      }
+    },
     []
   )
 

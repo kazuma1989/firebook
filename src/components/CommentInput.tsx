@@ -2,7 +2,7 @@ import { css, cx } from "@emotion/css"
 import { forwardRef, useState } from "react"
 import { addComment } from "../hooks/useComments"
 import { useCurrentUser } from "../hooks/useCurrentUser"
-import { AutoSizingTextarea } from "./AutoSizingTextarea"
+import { AutoSizingTextarea, Focusable } from "./AutoSizingTextarea"
 import { Avatar } from "./Avatar"
 import { ButtonCircle } from "./ButtonCircle"
 import { sendIcon } from "./icon"
@@ -20,7 +20,7 @@ export const CommentInput = forwardRef(function CommentInput(
     className?: string
     style?: React.CSSProperties
   },
-  ref: React.ForwardedRef<HTMLTextAreaElement>
+  ref: React.ForwardedRef<Focusable>
 ) {
   const { uid, displayName, photoURL } = useCurrentUser()
 

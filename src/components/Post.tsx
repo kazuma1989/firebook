@@ -3,6 +3,7 @@ import { useRef, useState } from "react"
 import { useAuthor } from "../hooks/useAuthor"
 import { useCurrentUser } from "../hooks/useCurrentUser"
 import { updatePost } from "../hooks/usePosts"
+import { Focusable } from "./AutoSizingTextarea"
 import { Avatar } from "./Avatar"
 import { Button } from "./Button"
 import { ButtonCircle } from "./ButtonCircle"
@@ -53,7 +54,7 @@ export function Post({
     setMenuVisible(false)
   }
 
-  const commentInput$ = useRef<HTMLTextAreaElement>(null)
+  const commentInput$ = useRef<Focusable>(null)
 
   return (
     <article
