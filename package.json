@@ -18,21 +18,14 @@
   },
   "dependencies": {
     "@emotion/css": "11.1.x",
-    "body-scroll-lock": "3.1.x",
-    "focus-trap": "6.4.x",
     "react": "17.0.x",
-    "react-dom": "17.0.x",
-    "react-router-dom": "5.2.x",
-    "swr": "0.5.x",
-    "tabbable": "5.2.x"
+    "react-dom": "17.0.x"
   },
   "devDependencies": {
     "@snowpack/plugin-dotenv": "2.1.x",
     "@snowpack/plugin-typescript": "1.2.x",
-    "@types/body-scroll-lock": "2.6.x",
     "@types/react": "17.0.x",
     "@types/react-dom": "17.0.x",
-    "@types/react-router-dom": "5.1.x",
     "@types/snowpack-env": "2.3.x",
     "@typescript-eslint/eslint-plugin": "4.22.x",
     "@typescript-eslint/parser": "4.22.x",

@@ -1,7 +1,7 @@
 # Firebook
 
 ```console
-npx hina kazuma1989/firebook#snowpack
+npx hina kazuma1989/firebook#snowpack-start
 ```
 
 ## これは何
