@@ -11,6 +11,10 @@
     "npm": ">=6.13.4"
   },
   "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
     "format": "prettier --write \"./{public,src}/**/*.{css,html,ts,tsx}\"",
     "lint": "eslint \"./src/**/*.{ts,tsx}\""
   },
@@ -21,21 +25,36 @@
     "react": "17.0.x",
     "react-dom": "17.0.x",
     "react-router-dom": "5.2.x",
+    "react-scripts": "4.0.3",
     "swr": "0.5.x",
     "tabbable": "5.2.x"
   },
   "devDependencies": {
     "@types/body-scroll-lock": "2.6.x",
+    "@types/jest": "26.0.x",
+    "@types/node": "*",
     "@types/react": "17.0.x",
     "@types/react-dom": "17.0.x",
     "@types/react-router-dom": "5.1.x",
-    "@typescript-eslint/eslint-plugin": "4.23.x",
-    "@typescript-eslint/parser": "4.23.x",
-    "eslint": "7.26.x",
-    "eslint-config-prettier": "8.3.x",
-    "eslint-plugin-react": "7.23.x",
-    "eslint-plugin-react-hooks": "4.2.x",
     "prettier": "2.3.x",
     "typescript": "4.2.x"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
