@@ -17,6 +17,14 @@
       crossorigin="anonymous"
       href="https://unpkg.com/ress@4.0.0/dist/ress.min.css"
     />
+
+    <script type="module">
+      // react-jsx 形式の JSX 変換が扱えないビルドツールで擬似的に react-jsx 形式を実現するためのハック。
+      // 擬似的というのは、import React をしないでいいというソースコード観点しか満たせず、JSX 変換後の動作効率の点は満たせないということ。
+      import _implicit_React from "react"
+      globalThis.React = _implicit_React
+    </script>
+    <script type="module" src="/dist/index.js"></script>
   </head>
 
   <body>

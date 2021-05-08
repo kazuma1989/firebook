@@ -3,4 +3,5 @@
 // .env.development, .env.production に値をセットする必要あり。
 
 export const ENV_MODE = import.meta.env.MODE
-export const ENV_API_ENDPOINT = import.meta.env.API_ENDPOINT
+export const ENV_API_ENDPOINT = import.meta.env
+  .SNOWPACK_PUBLIC_API_ENDPOINT as string
