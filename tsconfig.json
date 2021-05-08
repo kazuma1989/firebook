@@ -1,57 +1,84 @@
+// https://www.typescriptlang.org/ja/tsconfig
 {
-  "compilerOptions": {
-    // 最新のブラウザーで使える API を許可する。
-    "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+  // src フォルダーだけを対象にする。
+  "include": ["./src/**/*"],
 
-    // import 対象の探し方を決める。後方互換を求める理由がなければ原則 Node.
-    "moduleResolution": "Node",
+  "compilerOptions": {
+    //
+    // プロジェクト設定
+    //
+    // JavaScript ファイルは使う理由がないので許可しない。
+    "allowJs": false,
+
+    // tsc 以外のツールが TypeScript をトランスパイルしやすいようにいくつかの記法を禁止する。
+    "isolatedModules": true,
+
+    // <div /> を _jsx("div") に変換する。
+    // JSX を使いたいだけなら `import React` は不要。
+    "jsx": "react-jsx",
+
+    // 最新のブラウザーで使える API を許可する。
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
 
     // ES Module 記法で書くための設定。
     "module": "ESNext",
 
-    // <div /> を _jsx("div") に変換する。
-    // `import React` は基本不要で、もしインポートするときも `import * as React` としなくてよい。
-    "jsx": "react-jsx",
-    "allowSyntheticDefaultImports": true,
-
-    // tsc コマンドは自分のソースコードの型チェックだけに用いる（パッケージ間の整合性まではチェックしない）。
     // TypeScript から JavaScript の実行ファイルへの変換はほかの仕組みを使う。
-    "skipLibCheck": true,
     "noEmit": true,
 
-    // インポートした JSON ファイルにも型をつける。
-    // 一方 JS ファイルは許可しないでおく。
-    "resolveJsonModule": true,
-    "allowJs": false,
+    // 最新のブラウザーで使える文法を許可する。
+    "target": "ES2020",
 
-    // 個人的にそんなに使わないが、Create React App が要求するので設定してもいいかなというもの。
+    //
+    // 厳密なチェック
+    //
+    // できれば strict=true がいいが、あまり厳しくて TypeScript を使いづらく感じないように緩める。
+    "strict": false,
 
-    // すべてのファイルを「独立モジュール」として扱う。
-    // いくつかの記法が禁止されるが、普通は困らないと思う。
-    "isolatedModules": true,
+    // null/undefined になる可能性のある変数を教えてくれる。
+    "strictNullChecks": true,
+
+    //
+    // モジュール解決
+    //
+    // `import * as React from "react"` の代わりに `import React from "react"` と書ける。
+    "allowSyntheticDefaultImports": true,
 
     // allowSyntheticDefaultImports のランタイム版といったイメージ。
     // tsc でトランスパイルするわけではないので false でも構わない。
     "esModuleInterop": false,
 
+    // import 対象の探し方を決める。後方互換を求める理由がなければ原則 Node.
+    "moduleResolution": "Node",
+
+    //
+    // ソースマップ
+    //
+
+    //
+    // Linter Checks
+    //
     // true だと switch-case 文の break 忘れを検知するが、それは linter がやればいいと思う。
     "noFallthroughCasesInSwitch": false,
 
-    // 以下便利な型検査
+    // インデックスアクセスは null チェックが必要。
+    "noUncheckedIndexedAccess": true,
 
-    // any 不許可のような厳密な型検査は避けておく。
-    "strict": false,
+    //
+    // 実験的な機能
+    //
 
+    //
+    // Advanced
+    //
     // モジュール名（＝ファイル名）の大文字／小文字を厳密に区別する。
     // ファイル名の大文字／小文字が区別されない OS で役に立つ。
     "forceConsistentCasingInFileNames": true,
 
-    // null/undefined になる可能性のある変数を教えてくれる。
-    "strictNullChecks": true,
-    "noUncheckedIndexedAccess": true
-  },
+    // インポートした JSON ファイルにも型をつける。
+    "resolveJsonModule": true,
 
-  // src フォルダーだけを対象にする。
-  "include": ["./src/**/*"]
+    // tsc コマンドは自分のソースコードの型チェックだけに用いる（パッケージ間の整合性まではチェックしない）。
+    "skipLibCheck": true
+  }
 }
