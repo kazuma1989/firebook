@@ -1,7 +1,7 @@
 # Firebook
 
 ```console
-npx hina kazuma1989/firebook
+npx hina kazuma1989/firebook#start
 ```
 
 ## これは何
