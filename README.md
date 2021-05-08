@@ -1,7 +1,7 @@
 # Firebook
 
 ```console
-npx hina kazuma1989/firebook#cra
+npx hina kazuma1989/firebook#cra-start
 ```
 
 ## これは何

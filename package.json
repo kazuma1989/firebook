@@ -20,22 +20,15 @@
   },
   "dependencies": {
     "@emotion/css": "11.1.x",
-    "body-scroll-lock": "3.1.x",
-    "focus-trap": "6.4.x",
     "react": "17.0.x",
     "react-dom": "17.0.x",
-    "react-router-dom": "5.2.x",
-    "react-scripts": "4.0.3",
-    "swr": "0.5.x",
-    "tabbable": "5.2.x"
+    "react-scripts": "4.0.3"
   },
   "devDependencies": {
-    "@types/body-scroll-lock": "2.6.x",
     "@types/jest": "26.0.x",
     "@types/node": "*",
     "@types/react": "17.0.x",
     "@types/react-dom": "17.0.x",
-    "@types/react-router-dom": "5.1.x",
     "prettier": "2.3.x",
     "typescript": "4.2.x"
   },
