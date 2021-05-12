@@ -23,19 +23,21 @@ export function PostArea({
 }) {
   const posts = usePosts(targetUID)
 
-  const [deletingState, setDeletingState] = useState<{
-    postId: string
-    imgSrc?: string
-  } | null>(null)
+  const [deletingState, setDeletingState] =
+    useState<{
+      postId: string
+      imgSrc?: string
+    } | null>(null)
   const stopDeleting = () => {
     setDeletingState(null)
   }
 
-  const [editingState, setEditingState] = useState<{
-    postId: string
-    initialText?: string
-    initialImgSrc?: string
-  } | null>(null)
+  const [editingState, setEditingState] =
+    useState<{
+      postId: string
+      initialText?: string
+      initialImgSrc?: string
+    } | null>(null)
   const clearEditingState = () => {
     setEditingState(null)
   }

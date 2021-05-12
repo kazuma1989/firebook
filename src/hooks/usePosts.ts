@@ -20,9 +20,8 @@ interface Post {
 export function usePosts(targetUID: string | undefined): Post[] {
   const posts$ = useSWR<PostEntity[]>(`${ENV_API_ENDPOINT}/posts`)
 
-  const posts = (targetUID
-    ? posts$.data?.filter((p) => p.author === targetUID)
-    : posts$.data
+  const posts = (
+    targetUID ? posts$.data?.filter((p) => p.author === targetUID) : posts$.data
   )
     ?.map(
       ({ id, author, text, imgSrc, postedAt, likes, totalComments }): Post => ({

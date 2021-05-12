@@ -18,9 +18,8 @@ export function useComments(
 ): Comment[] {
   const comments$ = useSWR<CommentEntity[]>(`${ENV_API_ENDPOINT}/comments`)
 
-  const comments = (postId
-    ? comments$.data?.filter((c) => c.postId === postId)
-    : comments$.data
+  const comments = (
+    postId ? comments$.data?.filter((c) => c.postId === postId) : comments$.data
   )
     ?.slice(-limit)
     .reverse()

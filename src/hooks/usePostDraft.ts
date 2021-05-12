@@ -10,9 +10,8 @@ import { useImageDraft } from "./useImageDraft"
 export function usePostDraft(initialText: string = "", initialImgSrc?: string) {
   const [text, setText] = useState(initialText)
 
-  const [img, { setImgFile, setImgUploadProgress }] = useImageDraft(
-    initialImgSrc
-  )
+  const [img, { setImgFile, setImgUploadProgress }] =
+    useImageDraft(initialImgSrc)
 
   const dirty = text !== initialText || img?.src !== initialImgSrc
   const valid = text.trim() !== "" || Boolean(img)
